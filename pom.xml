@@ -63,6 +63,12 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+
     <!--
            JUnit is a unit testing library for Java.
     -->

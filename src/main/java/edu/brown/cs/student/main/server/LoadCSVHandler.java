@@ -21,7 +21,9 @@ public class LoadCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
-    // TODO: limit filepath to data directory (no ../ backtracking)
+    if (!(filepath.startsWith("data/")) || filepath.contains("/..")) {
+      return ResponseBuilder.buildException(404, "Illegal file path. File must be in the data folder.");
+    }
     try {
       FileReader reader = new FileReader(filepath);
       CreatorFromRow<String[]> creator = row -> row.toArray(new String[0]);

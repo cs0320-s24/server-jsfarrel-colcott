@@ -91,7 +91,8 @@ public class SearchCSVHandler implements Route {
       responseMap.put("results", searcher.search(toSearch, columnIdentifier, this.columnSpecifier));
       return ResponseBuilder.mapToJson(responseMap);
     } catch (FactoryFailureException e) {
-      return ResponseBuilder.buildException(400, "File has inconsistent number of entries in columns.");
+      return ResponseBuilder.buildException(
+          400, "File has inconsistent number of entries in columns.");
     } catch (IllegalArgumentException e) {
       return ResponseBuilder.buildException(400, e.getMessage());
     }

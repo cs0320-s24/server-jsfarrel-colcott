@@ -3,8 +3,10 @@ package edu.brown.cs.student.main.server;
 import edu.brown.cs.student.main.csv.CSVParser;
 import edu.brown.cs.student.main.csv.CreatorFromRow;
 import edu.brown.cs.student.main.csv.ParserState;
+import edu.brown.cs.student.main.exception.FactoryFailureException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -22,7 +24,8 @@ public class LoadCSVHandler implements Route {
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
     if (!(filepath.startsWith("data/")) || filepath.contains("/..")) {
-      return ResponseBuilder.buildException(404, "Illegal file path. File must be in the data folder.");
+      return ResponseBuilder.buildException(
+          404, "Illegal file path. File must be in the data folder.");
     }
     try {
       FileReader reader = new FileReader(filepath);
@@ -30,6 +33,12 @@ public class LoadCSVHandler implements Route {
       this.parserState.setParser(new CSVParser(reader, creator));
     } catch (FileNotFoundException e) {
       return ResponseBuilder.buildException(404, "File not found.");
+    } catch (FactoryFailureException e) {
+      // TODO: make this message more thorough
+      return ResponseBuilder.buildException(404, "Malformed CSV data.");
+    } catch (IOException e) {
+      // TODO: make this message more thorough
+      return ResponseBuilder.buildException(404, "Unable to read from file.");
     }
 
     // create response

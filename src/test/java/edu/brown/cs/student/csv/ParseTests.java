@@ -3,7 +3,6 @@ package edu.brown.cs.student.csv;
 import edu.brown.cs.student.main.csv.CSVParser;
 import edu.brown.cs.student.main.csv.CreatorFromRow;
 import edu.brown.cs.student.main.exception.FactoryFailureException;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -65,7 +64,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line1 = {"hi", "1", "2", "3"};
@@ -82,7 +81,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"a", "B", "Hello", "1", "4"};
@@ -97,7 +96,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"a"};
@@ -112,7 +111,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line1 = {"a"};
@@ -135,7 +134,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
 
@@ -143,39 +142,39 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseInvalidBasic() {
+  public void testParseInvalidBasic() throws IOException, FactoryFailureException {
     String input = "a,b\na,b,c";
     StringReader reader = new StringReader(input);
-    CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    Assert.expectThrows(IllegalArgumentException.class, () -> parser.parse());
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
   }
 
   @Test
-  public void testParseInvalidOneColumn() {
+  public void testParseInvalidOneColumn() throws IOException, FactoryFailureException {
     String input = "a\na\nb\na,c\ne\nf";
     StringReader reader = new StringReader(input);
-    CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    Assert.expectThrows(IllegalArgumentException.class, () -> parser.parse());
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
   }
 
   @Test
-  public void testParseInvalidMultiColumn() {
+  public void testParseInvalidMultiColumn() throws IOException, FactoryFailureException {
     String input = "a\na,b,d,e,f\nb\na,c\ne\nf";
     StringReader reader = new StringReader(input);
-    CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    Assert.expectThrows(IllegalArgumentException.class, () -> parser.parse());
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
   }
 
   @Test
-  public void testParseInvalidComma() {
+  public void testParseInvalidComma() throws IOException, FactoryFailureException {
     String input = "a\na\nb\na,,\ne\nf";
     StringReader reader = new StringReader(input);
-    CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    Assert.expectThrows(IllegalArgumentException.class, () -> parser.parse());
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
   }
 
   @Test
@@ -184,7 +183,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"hi", "", "", "", "hi"};
@@ -200,7 +199,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"", "", "", "", ""};
@@ -216,7 +215,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"Caesar", " Julius", " \"veni, vidi, vici\""};
@@ -231,7 +230,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"Caesar", " Julius", "", ""};
@@ -247,7 +246,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"Caesar", " Julius", "", ""};
@@ -263,11 +262,11 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseMalformedCSV() throws FileNotFoundException {
+  public void testParseMalformedCSV() throws IOException, FactoryFailureException {
     FileReader reader = new FileReader("data/malformed/malformed_signs.csv");
-    CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    Assert.expectThrows(IllegalArgumentException.class, () -> parser.parse());
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
   }
 
   @Test
@@ -275,7 +274,7 @@ public class ParseTests {
     FileReader reader = new FileReader("data/stars/ten-star.csv");
     CSVParser<String[]> parser = new CSVParser<>(reader, this.creator);
 
-    List<String[]> actualOutput = parser.parse();
+    List<String[]> actualOutput = parser.getParsed();
 
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line1 = {"StarID", "ProperName", "X", "Y", "Z"};
@@ -311,7 +310,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String> parser = new CSVParser<>(reader, creator2);
 
-    List<String> actualOutput = parser.parse();
+    List<String> actualOutput = parser.getParsed();
 
     List<String> expectedOutput = new ArrayList<>();
     String line = "Hello World!!!";
@@ -326,7 +325,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<String> parser = new CSVParser<>(reader, creator2);
 
-    List<String> actualOutput = parser.parse();
+    List<String> actualOutput = parser.getParsed();
 
     List<String> expectedOutput = new ArrayList<>();
     String line1 = "Hello World!!!";
@@ -343,7 +342,7 @@ public class ParseTests {
     StringReader reader = new StringReader(input);
     CSVParser<Integer> parser = new CSVParser<>(reader, creator3);
 
-    List<Integer> actualOutput = parser.parse();
+    List<Integer> actualOutput = parser.getParsed();
 
     List<Integer> expectedOutput = new ArrayList<>();
     int line1 = 10;
@@ -355,11 +354,10 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseCreateFactoryFail() {
+  public void testParseCreateFactoryFail() throws IOException, FactoryFailureException {
     String input = "1.0";
     StringReader reader = new StringReader(input);
-    CSVParser<Integer> parser = new CSVParser<>(reader, creator3);
 
-    Assert.expectThrows(FactoryFailureException.class, () -> parser.parse());
+    Assert.expectThrows(FactoryFailureException.class, () -> new CSVParser<>(reader, creator3));
   }
 }

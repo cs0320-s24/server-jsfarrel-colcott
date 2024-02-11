@@ -30,9 +30,11 @@ public class CSVParser<T> implements Iterable<T> {
    * @param newReader - a Reader that has the contents of a CSV file
    * @param newCreate - a CreatorFromRow object for creating rows
    */
-  public CSVParser(Reader newReader, CreatorFromRow<T> newCreate) {
+  public CSVParser(Reader newReader, CreatorFromRow<T> newCreate)
+      throws IOException, FactoryFailureException {
     this.reader = newReader;
     this.create = newCreate;
+    this.parse();
   }
 
   @NotNull
@@ -58,6 +60,10 @@ public class CSVParser<T> implements Iterable<T> {
         return null;
       }
     };
+  }
+
+  public List<T> getParsed() {
+    return this.parsed;
   }
 
   /**

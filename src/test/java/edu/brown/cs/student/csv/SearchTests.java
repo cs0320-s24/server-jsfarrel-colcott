@@ -5,7 +5,6 @@ import edu.brown.cs.student.main.csv.CSVSearcher;
 import edu.brown.cs.student.main.csv.CSVSearcher.ColumnSpecified;
 import edu.brown.cs.student.main.csv.CreatorFromRow;
 import edu.brown.cs.student.main.exception.FactoryFailureException;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -273,15 +272,14 @@ public class SearchTests {
   }
 
   @Test
-  public void testSearchMalformedData() throws FileNotFoundException {
+  public void testSearchMalformedData() throws IOException, FactoryFailureException {
     String filename = "malformed/malformed_signs.csv";
     String value = "hi";
     String column = "";
     FileReader fileReader = new FileReader("data/" + filename);
 
-    CSVParser<String[]> parser = new CSVParser<>(fileReader, this.creator);
-
-    Assert.expectThrows(IllegalArgumentException.class, () -> new CSVSearcher(parser, true));
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(fileReader, this.creator));
   }
 
   @Test
@@ -319,14 +317,13 @@ public class SearchTests {
   }
 
   @Test
-  public void testSearchBadParserFailure() {
+  public void testSearchBadParserFailure() throws IOException, FactoryFailureException {
     String data = ",a,b,\n,";
     String value = "";
     String column = "";
     StringReader stringReader = new StringReader(data);
-
-    CSVParser<String[]> parser = new CSVParser<>(stringReader, this.creator);
-    Assert.expectThrows(IllegalArgumentException.class, () -> new CSVSearcher(parser, true));
+    Assert.expectThrows(
+        IllegalArgumentException.class, () -> new CSVParser<>(stringReader, this.creator));
   }
 
   @Test
@@ -346,7 +343,7 @@ public class SearchTests {
   }
 
   @Test
-  public void testSearchColumnNameWithoutHeader() {
+  public void testSearchColumnNameWithoutHeader() throws IOException, FactoryFailureException {
     String data = "a,b,c\nA,B,C\nC,B,A";
     String value = "B";
     String column = "a";

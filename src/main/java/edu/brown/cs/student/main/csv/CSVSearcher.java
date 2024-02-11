@@ -27,15 +27,7 @@ public class CSVSearcher {
    */
   public CSVSearcher(CSVParser<String[]> newParser, boolean hasHeader) {
     this.parser = newParser;
-    try {
-      this.rows = this.parser.parse();
-    } catch (FactoryFailureException e) {
-      throw new IllegalArgumentException("Bad CSVParser: creating columns.");
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Bad CSVParser: invalid CSV formatting.");
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Bad CSVParser: reading from Reader.");
-    }
+    this.rows = this.parser.getParsed();
 
     this.numCols = 0;
     if (this.rows.size() > 0) {

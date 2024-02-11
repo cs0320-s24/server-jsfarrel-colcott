@@ -2,13 +2,13 @@ package edu.brown.cs.student.main.csv;
 
 public class ParserState {
 
-  private CSVParser parser;
+  private CSVParser<String[]> parser;
 
-  public void setParser(CSVParser parser) {
+  public void setParser(CSVParser<String[]> parser) {
     this.parser = parser;
   }
 
-  public CSVParser getParser() {
+  public CSVParser<String[]> getParser() {
     return this.parser;
   }
 }

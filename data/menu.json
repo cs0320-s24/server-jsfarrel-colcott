@@ -1,0 +1,17 @@
+[
+  {
+    "soupName": "gazpacho",
+    "ingredients": ["tomato", "pepper", "oil", "garlic"],
+    "isHot": false
+  },
+  {
+    "soupName": "squash",
+    "ingredients": ["butternut squash", "onion", "garlic", "sage"],
+    "isHot": true
+  },
+  {
+    "soupName": "french onion",
+    "ingredients": ["onion", "beef broth", "gruyere", "baguette"],
+    "isHot": true
+  }
+]

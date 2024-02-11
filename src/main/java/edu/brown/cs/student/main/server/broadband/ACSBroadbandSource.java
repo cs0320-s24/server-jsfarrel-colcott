@@ -17,6 +17,7 @@ public class ACSBroadbandSource implements BroadbandSource {
 
   @Override
   public BroadbandData getBroadBand(String state, String county) throws DatasourceException {
+    // todo: cleanup
     try {
       // https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*
       URL requestURL =
@@ -83,8 +84,10 @@ public class ACSBroadbandSource implements BroadbandSource {
       // S2801_C01_001E
       String totalHouseholds = broadBandResponse.get(1).get(2);
 
+      // todo: check if there's a better way to get this information/a datapoint that is already
+      //  what we are looking for
       double percentBroadband =
-          100 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
+          100.0 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
 
       return new BroadbandData(percentBroadband);
     } catch (IOException e) {

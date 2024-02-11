@@ -1,6 +1,7 @@
-package edu.brown.cs.student.main.server;
+package edu.brown.cs.student.main.server.csv;
 
 import edu.brown.cs.student.main.csv.ParserState;
+import edu.brown.cs.student.main.server.ResponseBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -16,10 +17,12 @@ public class ViewCSVHandler implements Route {
 
   @Override
   public Object handle(Request request, Response response) {
+    // todo: throw error if parserState isn't defined/loadcsv endpoint has yet to be called
     // create response
     Map<String, Object> responseMap = new HashMap<>();
     responseMap.put("code", 200);
-    responseMap.put("CSV data", this.parserState.getParser().getParsed());
+    responseMap.put("status", "success");
+    responseMap.put("csv", this.parserState.getParser().getParsed());
     return ResponseBuilder.mapToJson(responseMap);
   }
 }

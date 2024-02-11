@@ -23,6 +23,7 @@ public class BroadbandHandler implements Route {
     String county = request.queryParams("county");
 
     try {
+      // todo: caching, maybe having class for developer to implement
       BroadbandData broadbandData = this.source.getBroadBand(state, county);
       Map<String, Object> responseMap = new HashMap<>();
       responseMap.put("state", state);

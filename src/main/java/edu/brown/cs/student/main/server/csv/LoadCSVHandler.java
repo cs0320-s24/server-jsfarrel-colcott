@@ -1,9 +1,10 @@
-package edu.brown.cs.student.main.server;
+package edu.brown.cs.student.main.server.csv;
 
 import edu.brown.cs.student.main.csv.CSVParser;
 import edu.brown.cs.student.main.csv.CreatorFromRow;
 import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.exception.FactoryFailureException;
+import edu.brown.cs.student.main.server.ResponseBuilder;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,9 +24,10 @@ public class LoadCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
-    if (!(filepath.startsWith("data/")) || filepath.contains("/..")) {
+    // todo: through error if filepath is null or ""
+    if (!(filepath.startsWith("data/")) || filepath.contains("/..") || filepath.contains("../")) {
       return ResponseBuilder.buildException(
-          404, "Illegal file path. File must be in the data folder.");
+          400, "Illegal file path. File must be in the data folder.");
     }
     try {
       FileReader reader = new FileReader(filepath);
@@ -34,10 +36,10 @@ public class LoadCSVHandler implements Route {
     } catch (FileNotFoundException e) {
       return ResponseBuilder.buildException(404, "File not found.");
     } catch (FactoryFailureException e) {
-      // TODO: make this message more thorough
+      // TODO: make this message more thorough CHANGE CODE
       return ResponseBuilder.buildException(404, "Malformed CSV data.");
     } catch (IOException e) {
-      // TODO: make this message more thorough
+      // TODO: make this message more thorough CHANGE CODE
       return ResponseBuilder.buildException(404, "Unable to read from file.");
     }
 

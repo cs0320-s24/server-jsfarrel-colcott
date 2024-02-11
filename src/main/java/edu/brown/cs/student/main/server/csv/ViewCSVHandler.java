@@ -17,7 +17,10 @@ public class ViewCSVHandler implements Route {
 
   @Override
   public Object handle(Request request, Response response) {
-    // todo: throw error if parserState isn't defined/loadcsv endpoint has yet to be called
+    if (this.parserState.getParser() == null) {
+      return ResponseBuilder.buildException(
+          400, "File has yet to be loaded. " + "You must first use loadcsv.");
+    }
     // create response
     Map<String, Object> responseMap = new HashMap<>();
     responseMap.put("code", 200);

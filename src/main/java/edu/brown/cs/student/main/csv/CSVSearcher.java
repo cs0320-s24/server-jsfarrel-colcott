@@ -18,6 +18,7 @@ public class CSVSearcher {
   private List<String[]> rows;
   private String[] header;
   private int numCols;
+  private boolean hasHeader;
 
   /**
    * CSVSearcher constructor
@@ -27,6 +28,7 @@ public class CSVSearcher {
    */
   public CSVSearcher(CSVParser<String[]> newParser, boolean hasHeader) {
     this.parser = newParser;
+    this.hasHeader = hasHeader;
     this.rows = this.parser.getParsed();
 
     this.numCols = 0;
@@ -35,11 +37,11 @@ public class CSVSearcher {
     }
 
     this.header = new String[0];
-    if (hasHeader) {
+    if (this.hasHeader) {
       if (this.rows == null || this.rows.size() == 0) {
         throw new IllegalArgumentException("Invalid CSV: header specified for empty CSV");
       }
-      this.header = this.rows.remove(0);
+      this.header = this.rows.get(0);
     }
   }
 
@@ -126,10 +128,15 @@ public class CSVSearcher {
 
     List<Integer> checkColumns = getColumns(column, specification);
     // loop through rows and columns to check and add row if there is a matching value
-    for (String[] row : this.rows) {
+    // i; i < this.rows.size(); i++
+    int i;
+    for (i = 0; i < this.rows.size(); i++) {
+      if (i == 0 && this.hasHeader) {
+        i++;
+      }
       for (int colIndex : checkColumns) {
-        if (row[colIndex].equals(value)) {
-          result.add(row);
+        if (this.rows.get(i)[colIndex].equals(value)) {
+          result.add(this.rows.get(i));
           break;
         }
       }

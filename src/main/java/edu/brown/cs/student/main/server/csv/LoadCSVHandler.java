@@ -44,10 +44,9 @@ public class LoadCSVHandler implements Route {
     } catch (FileNotFoundException e) {
       return ResponseBuilder.buildException(404, "File not found.");
     } catch (FactoryFailureException e) {
-      // TODO: make this message more thorough CHANGE CODE
-      return ResponseBuilder.buildException(400, "Failed to convert rows in CSV.");
+      return ResponseBuilder.buildException(
+          400, "File has inconsistent number of entries in columns.");
     } catch (IOException e) {
-      // TODO: make this message more thorough CHANGE CODE
       return ResponseBuilder.buildException(400, "Unable to read from file.");
     } catch (IllegalArgumentException e) {
       return ResponseBuilder.buildException(400, "Malformed CSV data.");

@@ -24,11 +24,19 @@ public class LoadCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
-    // todo: through error if filepath is null or ""
+    if (filepath == null) {
+      return ResponseBuilder.buildException(400, "Must specify filepath in endpoint.");
+    }
+
     if (!(filepath.startsWith("data/")) || filepath.contains("/..") || filepath.contains("../")) {
       return ResponseBuilder.buildException(
           400, "Illegal file path. File must be in the data folder.");
     }
+    if(!filepath.endsWith(".csv")) {
+      return ResponseBuilder.buildException(
+          400, "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').");
+    }
+
     try {
       FileReader reader = new FileReader(filepath);
       CreatorFromRow<String[]> creator = row -> row.toArray(new String[0]);
@@ -40,6 +48,8 @@ public class LoadCSVHandler implements Route {
           400, "File has inconsistent number of entries in columns.");
     } catch (IOException e) {
       return ResponseBuilder.buildException(400, "Unable to read from file.");
+    } catch (IllegalArgumentException e) {
+      return ResponseBuilder.buildException(400, "Malformed CSV data.");
     }
 
     // create response

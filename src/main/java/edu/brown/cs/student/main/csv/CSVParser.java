@@ -31,7 +31,7 @@ public class CSVParser<T> implements Iterable<T> {
    * @param newCreate - a CreatorFromRow object for creating rows
    */
   public CSVParser(Reader newReader, CreatorFromRow<T> newCreate)
-      throws IOException, FactoryFailureException {
+      throws IOException, FactoryFailureException, IllegalArgumentException {
     this.reader = newReader;
     this.create = newCreate;
     this.parse();

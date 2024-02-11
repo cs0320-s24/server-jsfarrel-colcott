@@ -24,8 +24,8 @@ public class ViewCSVHandler implements Route {
     // create response
     Map<String, Object> responseMap = new HashMap<>();
     responseMap.put("code", 200);
-    responseMap.put("status", "success");
-    responseMap.put("csv", this.parserState.getParser().getParsed());
+    responseMap.put("type", "success");
+    responseMap.put("data", this.parserState.getParser().getParsed());
     return ResponseBuilder.mapToJson(responseMap);
   }
 }

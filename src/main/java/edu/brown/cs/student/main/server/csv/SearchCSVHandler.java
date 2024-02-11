@@ -87,7 +87,7 @@ public class SearchCSVHandler implements Route {
       CSVSearcher searcher = new CSVSearcher(this.parserState.getParser(), hasHeaders);
       Map<String, Object> responseMap = new HashMap<>();
       responseMap.put("code", 200);
-      responseMap.put("status", "success");
+      responseMap.put("type", "success");
       responseMap.put("results", searcher.search(toSearch, columnIdentifier, this.columnSpecifier));
       return ResponseBuilder.mapToJson(responseMap);
     } catch (FactoryFailureException e) {

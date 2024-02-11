@@ -3,6 +3,8 @@ package edu.brown.cs.student.main.server;
 import static spark.Spark.after;
 
 import edu.brown.cs.student.main.csv.ParserState;
+import edu.brown.cs.student.main.server.broadband.ACSBroadbandSource;
+import edu.brown.cs.student.main.server.broadband.BroadbandHandler;
 import spark.Spark;
 
 public class Server {
@@ -19,6 +21,7 @@ public class Server {
     ParserState parser = new ParserState();
 
     // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv
+    Spark.get("broadband", new BroadbandHandler(new ACSBroadbandSource()));
     Spark.get("loadcsv", new LoadCSVHandler(parser));
     Spark.get("viewcsv", new ViewCSVHandler(parser));
     Spark.get("searchcsv", new SearchCSVHandler(parser));

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -28,7 +29,6 @@ public class BroadbandHandler implements Route {
     }
 
     try {
-      // todo: caching, maybe having class for developer to implement
       BroadbandData broadbandData = this.source.getBroadBand(state, county);
       Map<String, Object> responseMap = new HashMap<>();
       responseMap.put("state", state);
@@ -36,8 +36,9 @@ public class BroadbandHandler implements Route {
       responseMap.put("percent", broadbandData.percentBroadband());
       // src:
       // https://stackoverflow.com/questions/2942857/how-to-convert-current-date-into-string-in-java
-      // TODO: timezone?
-      responseMap.put("date", new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));
+      SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+      dateFormat.setTimeZone(TimeZone.getTimeZone("EST"));
+      responseMap.put("date", dateFormat.format(new Date()) + " EST");
       responseMap.put("type", "success");
       responseMap.put("code", 200);
       return ResponseBuilder.mapToJson(responseMap);

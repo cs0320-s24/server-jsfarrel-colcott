@@ -518,8 +518,6 @@ public class TestSearchCSVHandler {
     loadConnection.disconnect();
   }
 
-  // TODO: test for csv they want us to load in docs. make sure to also test with search and view
-
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
    *

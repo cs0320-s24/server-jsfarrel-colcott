@@ -14,5 +14,4 @@ public class MockBroadbandSource implements BroadbandSource {
   public BroadbandData getBroadBand(String state, String county) {
     return new BroadbandData(this.percentBroadband);
   }
-
 }

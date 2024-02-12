@@ -21,8 +21,9 @@ public class BroadbandHandler implements Route {
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
-    if(state == null || county == null) {
-      return ResponseBuilder.buildException(400, "Missing params. Please include state and county.");
+    if (state == null || county == null) {
+      return ResponseBuilder.buildException(
+          400, "Missing params. Please include state and county.");
     }
 
     try {

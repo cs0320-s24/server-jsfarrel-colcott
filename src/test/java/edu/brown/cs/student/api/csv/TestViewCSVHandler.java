@@ -1,6 +1,7 @@
 package edu.brown.cs.student.api.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -33,7 +34,8 @@ public class TestViewCSVHandler {
     Logger.getLogger("").setLevel(Level.WARNING); // empty name = root
   }
 
-  private final Type mapStringObject = Types.newParameterizedType(Map.class, String.class, Object.class);
+  private final Type mapStringObject =
+      Types.newParameterizedType(Map.class, String.class, Object.class);
   private JsonAdapter<Map<String, Object>> adapter;
 
   @BeforeEach
@@ -59,17 +61,17 @@ public class TestViewCSVHandler {
   /**
    * Helper to start a connection to a specific API endpoint/params
    *
-   * The "throws" clause doesn't matter below -- JUnit will fail if an
-   *     exception is thrown that hasn't been declared as a parameter to @Test.
+   * <p>The "throws" clause doesn't matter below -- JUnit will fail if an exception is thrown that
+   * hasn't been declared as a parameter to @Test.
    *
-   * @param apiCall the call string, including endpoint
-   *                (Note: this would be better if it had more structure!)
+   * @param apiCall the call string, including endpoint (Note: this would be better if it had more
+   *     structure!)
    * @return the connection for the given URL, just after connecting
    * @throws IOException if the connection fails for some reason
    */
   private HttpURLConnection tryRequest(String apiCall) throws IOException {
     // Configure the connection (but don't actually send a request yet)
-    URL requestURL = new URL("http://localhost:"+Spark.port()+"/"+apiCall);
+    URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
     // The request body contains a Json object
     clientConnection.setRequestProperty("Content-Type", "application/json");
@@ -84,9 +86,10 @@ public class TestViewCSVHandler {
   public void testViewDataSuccess() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath="+filepath);
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
 
     HttpURLConnection viewConnection = tryRequest("viewcsv");
@@ -124,8 +127,8 @@ public class TestViewCSVHandler {
     HttpURLConnection viewConnection = tryRequest("viewcsv?hello=hi");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
 
-
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("StarID", "ProperName", "X", "Y", "Z"));
@@ -152,7 +155,8 @@ public class TestViewCSVHandler {
     HttpURLConnection viewConnection = tryRequest("viewcsv?hello=hi");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
     showDetailsIfError(responseBody);
 
     assertEquals("error", responseBody.get("type"));
@@ -164,10 +168,11 @@ public class TestViewCSVHandler {
   public void testViewAfterFailureLoading() throws IOException {
     String filepath = "data/malformed/malformed_signs.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath="+filepath);
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("error", responseBody.get("type"));
 
@@ -183,17 +188,37 @@ public class TestViewCSVHandler {
     loadConnection.disconnect();
   }
 
-  // TODO: test for csv they want us to load in docs. make sure to also test with search and view
+  @Test
+  public void testViewRhodeIslandIncome() throws IOException {
+    String filepath = "data/rhode_island_income.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+
+    HttpURLConnection viewConnection = tryRequest("viewcsv");
+    assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
+    responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+
+    assertEquals("success", responseBody.get("type"));
+    assertNotNull(responseBody.get("data"));
+    assertEquals(ArrayList.class, responseBody.get("data").getClass());
+
+    loadConnection.disconnect();
+    viewConnection.disconnect();
+  }
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
+   *
    * @param body
    */
   private void showDetailsIfError(Map<String, Object> body) {
-    if(body.containsKey("type") && "error".equals(body.get("type"))) {
+    if (body.containsKey("type") && "error".equals(body.get("type"))) {
       System.out.println(body.toString());
     }
   }
-
-
 }

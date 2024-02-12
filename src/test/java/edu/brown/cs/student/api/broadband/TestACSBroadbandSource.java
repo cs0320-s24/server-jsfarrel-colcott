@@ -18,8 +18,7 @@ public class TestACSBroadbandSource {
       double percent = data.percentBroadband();
       Assert.assertTrue(percent >= 0.0);
       Assert.assertTrue(percent <= 100.0);
-    }
-    catch (DatasourceException e) {
+    } catch (DatasourceException e) {
       Assert.fail();
     }
   }
@@ -29,5 +28,4 @@ public class TestACSBroadbandSource {
     ACSBroadbandSource source = new ACSBroadbandSource();
     Assert.expectThrows(DatasourceException.class, () -> source.getBroadBand("", ""));
   }
-
 }

@@ -32,7 +32,7 @@ public class LoadCSVHandler implements Route {
       return ResponseBuilder.buildException(
           400, "Illegal file path. File must be in the data folder.");
     }
-    if(!filepath.endsWith(".csv")) {
+    if (!filepath.endsWith(".csv")) {
       return ResponseBuilder.buildException(
           400, "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').");
     }

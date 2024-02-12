@@ -28,7 +28,8 @@ public class TestBroadbandHandler {
     Logger.getLogger("").setLevel(Level.WARNING); // empty name = root
   }
 
-  private final Type mapStringObject = Types.newParameterizedType(Map.class, String.class, Object.class);
+  private final Type mapStringObject =
+      Types.newParameterizedType(Map.class, String.class, Object.class);
   private JsonAdapter<Map<String, Object>> adapter;
 
   @BeforeEach
@@ -52,17 +53,17 @@ public class TestBroadbandHandler {
   /**
    * Helper to start a connection to a specific API endpoint/params
    *
-   * The "throws" clause doesn't matter below -- JUnit will fail if an
-   *     exception is thrown that hasn't been declared as a parameter to @Test.
+   * <p>The "throws" clause doesn't matter below -- JUnit will fail if an exception is thrown that
+   * hasn't been declared as a parameter to @Test.
    *
-   * @param apiCall the call string, including endpoint
-   *                (Note: this would be better if it had more structure!)
+   * @param apiCall the call string, including endpoint (Note: this would be better if it had more
+   *     structure!)
    * @return the connection for the given URL, just after connecting
    * @throws IOException if the connection fails for some reason
    */
   private HttpURLConnection tryRequest(String apiCall) throws IOException {
     // Configure the connection (but don't actually send a request yet)
-    URL requestURL = new URL("http://localhost:"+Spark.port()+"/"+apiCall);
+    URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
     // The request body contains a Json object
     clientConnection.setRequestProperty("Content-Type", "application/json");
@@ -81,7 +82,8 @@ public class TestBroadbandHandler {
 
     HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("success", responseBody.get("type"));
 
@@ -100,7 +102,8 @@ public class TestBroadbandHandler {
 
     HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("success", responseBody.get("type"));
 
@@ -118,7 +121,8 @@ public class TestBroadbandHandler {
 
     HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("error", responseBody.get("type"));
 
@@ -132,7 +136,8 @@ public class TestBroadbandHandler {
 
     HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("error", responseBody.get("type"));
 
@@ -143,7 +148,8 @@ public class TestBroadbandHandler {
   public void testBroadbandFailureMissingBothParams() throws IOException {
     HttpURLConnection broadbandConnection = tryRequest("broadband");
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody = this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
     assertEquals("error", responseBody.get("type"));
 
@@ -152,10 +158,11 @@ public class TestBroadbandHandler {
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
+   *
    * @param body
    */
   private void showDetailsIfError(Map<String, Object> body) {
-    if(body.containsKey("type") && "error".equals(body.get("type"))) {
+    if (body.containsKey("type") && "error".equals(body.get("type"))) {
       System.out.println(body.toString());
     }
   }

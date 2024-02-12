@@ -12,6 +12,11 @@ import edu.brown.cs.student.main.server.csv.ViewCSVHandler;
 import java.util.concurrent.TimeUnit;
 import spark.Spark;
 
+/**
+ * Main class for initializing a server.
+ * Includes 4 endpoints: /broadband, /loadcsv, /viewcsv, /searchcsv
+ * Run Server.main to start and initialize server.
+ */
 public class Server {
   public static void main(String[] args) {
     int port = 3232;
@@ -23,8 +28,8 @@ public class Server {
           response.header("Access-Control-Allow-Methods", "*");
         });
 
+    // ParserState saves a given parser to use among loadcsv, viewcsv, searchcsv endpoints
     ParserState parser = new ParserState();
-
     CacheBuilder<Object, Object> cacheBuilder =
         CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
 

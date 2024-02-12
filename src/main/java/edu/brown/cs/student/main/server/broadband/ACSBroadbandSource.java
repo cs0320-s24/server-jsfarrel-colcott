@@ -12,14 +12,27 @@ import java.net.URLConnection;
 import java.util.List;
 import okio.Buffer;
 
+/**
+ * ACSBroadbandSource
+ * Uses the ACS API to get information about broadband coverage in given county, state
+ * Takes in params: state, county
+ */
 public class ACSBroadbandSource implements BroadbandSource {
 
   private List<List<String>> states;
 
+  /**
+   * getBroadBand returns BroadbandData (percent broadband coverage) for a state and county
+   * @param state is String representation of state we are looking for broadband coverage of
+   * @param county is String representation of county we are looking for broadband coverage of
+   * @return BroadbandData from ACS API for result
+   * @throws DatasourceException
+   */
   @Override
   public BroadbandData getBroadBand(String state, String county) throws DatasourceException {
     // todo: cleanup
     try {
+      // Endpoint for state ids:
       // https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*
       URL requestURL =
           new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
@@ -46,6 +59,7 @@ public class ACSBroadbandSource implements BroadbandSource {
         throw new DatasourceException("Invalid state input");
       }
 
+      // Get counties from state id
       requestURL =
           new URL(
               "https",
@@ -67,8 +81,8 @@ public class ACSBroadbandSource implements BroadbandSource {
       if (stateId.equals("-1")) {
         throw new DatasourceException("Invalid county input");
       }
-
-      // https://api.census.gov/data/2022/acs/acs1/subject?get=NAME,group(S2801)&for=state:10,county:10
+      // Endpoint for getting info from county:
+      // https://api.census.gov/data/2022/acs/acs1/subject?get=x&for=state:y,county:z
       requestURL =
           new URL(
               "https",
@@ -80,9 +94,9 @@ public class ACSBroadbandSource implements BroadbandSource {
       clientConnection = connect(requestURL);
       List<List<String>> broadBandResponse =
           listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-      // S2801_C01_014E
+      // broadbandHouseholds labeled as: S2801_C01_014E
       String broadbandHouseholds = broadBandResponse.get(1).get(1);
-      // S2801_C01_001E
+      // totalHouseholds labeled as: S2801_C01_001E
       String totalHouseholds = broadBandResponse.get(1).get(2);
 
       // todo: check if there's a better way to get this information/a datapoint that is already

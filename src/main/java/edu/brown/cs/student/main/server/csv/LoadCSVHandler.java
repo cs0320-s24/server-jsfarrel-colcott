@@ -14,13 +14,28 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * LoadCSVHandler
+ * Handles requests to loadcsv endpoint.
+ * Takes in params: filepath and saves parse to ParserState.
+ */
 public class LoadCSVHandler implements Route {
   private final ParserState parserState;
 
+  /**
+   * LoadCSVHandler constructor saves ParserState
+   * @param parserState is the parser for the server
+   */
   public LoadCSVHandler(ParserState parserState) {
     this.parserState = parserState;
   }
 
+  /**
+   * handle manages request and response to endpoint
+   * @param request is the request to the endpoint. Includes filepath parameter which must be defined.
+   * @param response is the response from the endpoint
+   * @return Object response to request
+   */
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");

@@ -11,14 +11,32 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * SearchCSVHandler
+ * Handles requests to searchcsv endpoint.
+ * Takes in params: toSearch, columnSpecifier, columnIdentifier, hasHeader
+ * and saves parse to ParserState.
+ */
 public class SearchCSVHandler implements Route {
   private final ParserState parserState;
   private ColumnSpecified columnSpecifier;
 
+  /**
+   * SearchCSVHandler constructor saves ParserState
+   * @param parserState is the parser for the server
+   */
   public SearchCSVHandler(ParserState parserState) {
     this.parserState = parserState;
   }
 
+  /**
+   * undefinedHandling determines whether there is an issue with the inputs to SearchCSVHandler
+   * @param toSearch - the value being searched for
+   * @param columnSpecifierString - the specification for column
+   * @param columnIdentifier - the column being identified
+   * @param headerParam - weather csv has headers
+   * @return the status code depending on whether there's an issue with defined/undefined inputs
+   */
   private StatusCode undefinedHandling(
       String toSearch, String columnSpecifierString, String columnIdentifier, String headerParam) {
     if (toSearch == null) {
@@ -67,6 +85,12 @@ public class SearchCSVHandler implements Route {
     return new StatusCode(200, "");
   }
 
+  /**
+   * handle manages request and response to endpoint
+   * @param request is the request to the endpoint. Includes searching params.
+   * @param response is the response from the endpoint
+   * @return Object response to request
+   */
   @Override
   public Object handle(Request request, Response response) {
     if (this.parserState.getParser() == null) {

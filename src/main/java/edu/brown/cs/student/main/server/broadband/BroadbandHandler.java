@@ -18,9 +18,12 @@ public class BroadbandHandler implements Route {
   }
 
   public Object handle(Request request, Response response) {
-    // todo: throw errors if state/county is null or ""
     String state = request.queryParams("state");
     String county = request.queryParams("county");
+
+    if(state == null || county == null) {
+      return ResponseBuilder.buildException(400, "Missing params. Please include state and county.");
+    }
 
     try {
       // todo: caching, maybe having class for developer to implement
@@ -33,8 +36,10 @@ public class BroadbandHandler implements Route {
       // https://stackoverflow.com/questions/2942857/how-to-convert-current-date-into-string-in-java
       // TODO: timezone?
       responseMap.put("date", new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));
+      responseMap.put("type", "success");
+      responseMap.put("code", 200);
       return ResponseBuilder.mapToJson(responseMap);
-    } catch (Exception e) {
+    } catch (DatasourceException e) {
       return ResponseBuilder.buildException(400, e.getMessage());
     }
   }

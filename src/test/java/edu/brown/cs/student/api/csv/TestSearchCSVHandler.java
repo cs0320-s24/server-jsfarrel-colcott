@@ -1,4 +1,4 @@
-package edu.brown.cs.student.api.csv.integration;
+package edu.brown.cs.student.api.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

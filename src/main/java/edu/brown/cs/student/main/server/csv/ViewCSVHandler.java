@@ -8,13 +8,28 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * ViewCSVHandler
+ * Handles requests to viewcsv endpoint.
+ * Takes in no params and saves parse to ParserState.
+ */
 public class ViewCSVHandler implements Route {
   private final ParserState parserState;
 
+  /**
+   * ViewCSVHandler constructor saves ParserState
+   * @param parserState is the parser for the server
+   */
   public ViewCSVHandler(ParserState parserState) {
     this.parserState = parserState;
   }
 
+  /**
+   * handle manages request and response to endpoint
+   * @param request is the request to the endpoint
+   * @param response is the response from the endpoint
+   * @return Object response to request
+   */
   @Override
   public Object handle(Request request, Response response) {
     if (this.parserState.getParser() == null) {

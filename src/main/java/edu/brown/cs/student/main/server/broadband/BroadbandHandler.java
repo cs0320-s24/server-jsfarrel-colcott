@@ -11,14 +11,29 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * BroadbandHandler
+ * Handles requests to broadband endpoint.
+ * Takes in params: state, county and saves source in BroadbandSource.
+ */
 public class BroadbandHandler implements Route {
 
   private BroadbandSource source;
 
+  /**
+   * BroadbandHandler constructor saves BroadbandSource
+   * @param source is a BroadbandSource where we get broadband data from
+   */
   public BroadbandHandler(BroadbandSource source) {
     this.source = source;
   }
 
+  /**
+   * handle manages request and response to endpoint
+   * @param request is the request to the endpoint. Includes state and county which must be defined.
+   * @param response is the response from the endpoint
+   * @return Object response to request
+   */
   public Object handle(Request request, Response response) {
     String state = request.queryParams("state");
     String county = request.queryParams("county");

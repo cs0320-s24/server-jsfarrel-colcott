@@ -47,6 +47,18 @@ Endpoint design choices:
     - Creates a `CSVSearcher` and attempts to search within CSV with given params.
     - Will response with object of results or error.
 
+All responses have "result" field that equals:
+- “success” on success
+- "error_bad_json" if the request was ill-formed
+- "error_bad_request" if the request was missing a needed field, or the field was ill-formed
+- "error_datasource" if the given data source wasn't accessible (e.g., the file didn't exist or the ACS API returned an error for a given location)
+
+All endpoints with params requested (`/broadband`, `/loadcsv`, `/searchcsv`) respond with fields that repeat back the parameters given
+(e.g. `/loadcsv` response has field “filepath” - the “filepath” given is request)
+
+Successful viewcsv and searchcsv responses have "data" field containing contents of CSV.
+
+
 The program also includes a CSV search and parse functionality, split into two Classes and parts: parsing and searching. To initialize a
 `CSVSearcher`, you must first initialize a `CSVParser` because it it is an input to `CSVSearcher`.
 

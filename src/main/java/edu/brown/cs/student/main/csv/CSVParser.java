@@ -39,6 +39,11 @@ public class CSVParser<T> implements Iterable<T> {
     this.parse();
   }
 
+  /**
+   * Override for iterator so one can iterate over rows after parsing
+   *
+   * @return Iterator object
+   */
   @NotNull
   @Override
   public Iterator<T> iterator() {
@@ -74,7 +79,7 @@ public class CSVParser<T> implements Iterable<T> {
   /**
    * Parse the CSV, reading from reader, create rows, and return list of rows in CSV.
    *
-   * @return
+   * @return List of rows of type T
    * @throws IOException if failure reading CSV file
    * @throws FactoryFailureException if failure creating row
    * @throws IllegalArgumentException if invalid CSV file

@@ -35,7 +35,10 @@ public class ViewCSVHandler implements Route {
   public Object handle(Request request, Response response) {
     if (this.parserState.getParser() == null) {
       return ResponseBuilder.buildException(
-          "error_bad_json", 400, "File has yet to be loaded. " + "You must first use loadcsv.");
+          "error_bad_json",
+          400,
+          "File has yet to be loaded. " + "You must first use loadcsv.",
+          new HashMap<>());
     }
     // create response
     Map<String, Object> responseMap = new HashMap<>();

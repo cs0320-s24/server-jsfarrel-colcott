@@ -94,19 +94,28 @@ public class SearchCSVHandler implements Route {
    */
   @Override
   public Object handle(Request request, Response response) {
+    Map<String, Object> paramMap = new HashMap<>();
+    String toSearch = request.queryParams("toSearch");
+    String columnSpecifierString = request.queryParams("columnSpecifier");
+    String columnIdentifier = request.queryParams("columnIdentifier");
+    String headerParam = request.queryParams("hasHeaders");
+    paramMap.put("toSearch", toSearch);
+    paramMap.put("columnSpecifier", columnSpecifierString);
+    paramMap.put("columnIdentifier", columnIdentifier);
+    paramMap.put("hasHeaders", headerParam);
     if (this.parserState.getParser() == null) {
       return ResponseBuilder.buildException(
-          "error_bad_json", 400, "File has yet to be loaded. " + "You must first use loadcsv.");
+          "error_bad_json",
+          400,
+          "File has yet to be loaded. " + "You must first use loadcsv.",
+          paramMap);
     }
     try {
-      String toSearch = request.queryParams("toSearch");
-      String columnSpecifierString = request.queryParams("columnSpecifier");
-      String columnIdentifier = request.queryParams("columnIdentifier");
-      String headerParam = request.queryParams("hasHeaders");
       StatusCode status =
           this.undefinedHandling(toSearch, columnSpecifierString, columnIdentifier, headerParam);
       if (status.code() != 200) {
-        return ResponseBuilder.buildException("error_bad_request", status.code(), status.message());
+        return ResponseBuilder.buildException(
+            "error_bad_request", status.code(), status.message(), paramMap);
       }
       boolean hasHeaders = headerParam.equals("true");
       CSVSearcher searcher = new CSVSearcher(this.parserState.getParser(), hasHeaders);
@@ -114,16 +123,15 @@ public class SearchCSVHandler implements Route {
       responseMap.put("code", 200);
       responseMap.put("result", "success");
       responseMap.put("data", searcher.search(toSearch, columnIdentifier, this.columnSpecifier));
-      responseMap.put("toSearch", toSearch);
-      responseMap.put("columnSpecifier", columnSpecifierString);
-      responseMap.put("columnIdentifier", columnIdentifier);
-      responseMap.put("hasHeaders", headerParam);
+      for (String key : paramMap.keySet()) {
+        responseMap.put(key, paramMap.get(key));
+      }
       return ResponseBuilder.mapToJson(responseMap);
     } catch (FactoryFailureException e) {
       return ResponseBuilder.buildException(
-          "error_datasource", 400, "File has inconsistent number of entries in columns.");
+          "error_datasource", 400, "File has inconsistent number of entries in columns.", paramMap);
     } catch (IllegalArgumentException e) {
-      return ResponseBuilder.buildException("error_bad_request", 400, e.getMessage());
+      return ResponseBuilder.buildException("error_bad_request", 400, e.getMessage(), paramMap);
     }
   }
 }

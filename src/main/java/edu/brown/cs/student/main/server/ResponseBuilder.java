@@ -42,13 +42,17 @@ public class ResponseBuilder {
    * @param description a description of the exception
    * @return a String representation (JSON) of the exception with code, description, and type
    */
-  public static String buildException(String errorCode, int code, String description) {
+  public static String buildException(
+      String errorCode, int code, String description, Map<String, Object> params) {
     JsonAdapter<Map<String, Object>> adapter = createAdapter();
     Map<String, Object> responseMap = new HashMap<>();
 
     responseMap.put("result", errorCode);
     responseMap.put("code", code);
     responseMap.put("description", description);
+    for (String key : params.keySet()) {
+      responseMap.put(key, params.get(key));
+    }
     return adapter.toJson(responseMap);
   }
 }

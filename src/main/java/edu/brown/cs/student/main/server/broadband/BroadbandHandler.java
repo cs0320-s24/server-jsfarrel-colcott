@@ -38,10 +38,13 @@ public class BroadbandHandler implements Route {
   public Object handle(Request request, Response response) {
     String state = request.queryParams("state");
     String county = request.queryParams("county");
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("state", state);
+    paramMap.put("county", county);
 
     if (state == null || county == null) {
       return ResponseBuilder.buildException(
-          "error_bad_request", 400, "Missing params. Please include state and county.");
+          "error_bad_request", 400, "Missing params. Please include state and county.", paramMap);
     }
 
     try {
@@ -57,9 +60,12 @@ public class BroadbandHandler implements Route {
       responseMap.put("date", dateFormat.format(new Date()) + " EST");
       responseMap.put("result", "success");
       responseMap.put("code", 200);
+      for (String key : paramMap.keySet()) {
+        responseMap.put(key, paramMap.get(key));
+      }
       return ResponseBuilder.mapToJson(responseMap);
     } catch (DatasourceException e) {
-      return ResponseBuilder.buildException("error_datasource", 400, e.getMessage());
+      return ResponseBuilder.buildException("error_datasource", 400, e.getMessage(), paramMap);
     }
   }
 }

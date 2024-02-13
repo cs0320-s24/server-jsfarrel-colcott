@@ -41,20 +41,23 @@ public class LoadCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("filepath", filepath);
     if (filepath == null || filepath.isEmpty()) {
       return ResponseBuilder.buildException(
-          "error_bad_request", 400, "Must specify filepath in endpoint.");
+          "error_bad_request", 400, "Must specify filepath in endpoint.", paramMap);
     }
 
     if (!(filepath.startsWith("data/")) || filepath.contains("/..") || filepath.contains("../")) {
       return ResponseBuilder.buildException(
-          "error_datasource", 400, "Illegal file path. File must be in the data folder.");
+          "error_datasource", 400, "Illegal file path. File must be in the data folder.", paramMap);
     }
     if (!filepath.endsWith(".csv")) {
       return ResponseBuilder.buildException(
           "error_datasource",
           400,
-          "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').");
+          "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').",
+          paramMap);
     }
 
     try {
@@ -62,14 +65,16 @@ public class LoadCSVHandler implements Route {
       CreatorFromRow<String[]> creator = row -> row.toArray(new String[0]);
       this.parserState.setParser(new CSVParser(reader, creator));
     } catch (FileNotFoundException e) {
-      return ResponseBuilder.buildException("error_datasource", 404, "File not found.");
+      return ResponseBuilder.buildException("error_datasource", 404, "File not found.", paramMap);
     } catch (FactoryFailureException e) {
       return ResponseBuilder.buildException(
-          "error_datasource", 400, "File has inconsistent number of entries in columns.");
+          "error_datasource", 400, "File has inconsistent number of entries in columns.", paramMap);
     } catch (IOException e) {
-      return ResponseBuilder.buildException("error_datasource", 400, "Unable to read from file.");
+      return ResponseBuilder.buildException(
+          "error_datasource", 400, "Unable to read from file.", paramMap);
     } catch (IllegalArgumentException e) {
-      return ResponseBuilder.buildException("error_datasource", 400, "Malformed CSV data.");
+      return ResponseBuilder.buildException(
+          "error_datasource", 400, "Malformed CSV data.", paramMap);
     }
 
     // create response

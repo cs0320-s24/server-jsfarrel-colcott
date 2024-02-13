@@ -118,7 +118,7 @@ public class TestViewCSVHandler {
     result.add(Arrays.asList("87666", "Barnard's Star", "-0.01729", "-1.81533", "0.14824"));
     result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
 
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
     assertEquals(result, responseBody.get("data"));
 
     loadConnection.disconnect();
@@ -151,7 +151,7 @@ public class TestViewCSVHandler {
     result.add(Arrays.asList("87666", "Barnard's Star", "-0.01729", "-1.81533", "0.14824"));
     result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
 
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
     assertEquals(result, responseBody.get("data"));
 
     loadConnection.disconnect();
@@ -211,7 +211,7 @@ public class TestViewCSVHandler {
     responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
     showDetailsIfError(responseBody);
 
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
     assertNotNull(responseBody.get("data"));
     assertEquals(ArrayList.class, responseBody.get("data").getClass());
 

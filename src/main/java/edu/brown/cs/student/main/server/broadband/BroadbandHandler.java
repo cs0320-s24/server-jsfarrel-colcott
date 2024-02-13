@@ -55,7 +55,7 @@ public class BroadbandHandler implements Route {
       SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
       dateFormat.setTimeZone(TimeZone.getTimeZone("EST"));
       responseMap.put("date", dateFormat.format(new Date()) + " EST");
-      responseMap.put("type", "success");
+      responseMap.put("result", "success");
       responseMap.put("code", 200);
       return ResponseBuilder.mapToJson(responseMap);
     } catch (DatasourceException e) {

@@ -93,7 +93,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(50.0, responseBody.get("percent"));
     assertEquals(state, responseBody.get("state"));
@@ -113,7 +113,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(50.0, responseBody.get("percent"));
     assertEquals(state, responseBody.get("state"));

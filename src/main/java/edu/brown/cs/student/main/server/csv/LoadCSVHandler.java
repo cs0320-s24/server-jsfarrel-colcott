@@ -74,7 +74,7 @@ public class LoadCSVHandler implements Route {
 
     // create response
     Map<String, Object> responseMap = new HashMap<>();
-    responseMap.put("type", "success");
+    responseMap.put("result", "success");
     responseMap.put("code", 200);
     responseMap.put("filepath", filepath);
     return ResponseBuilder.mapToJson(responseMap);

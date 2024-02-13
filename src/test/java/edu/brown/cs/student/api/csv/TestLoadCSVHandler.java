@@ -103,7 +103,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(filepath, responseBody.get("filepath"));
 
@@ -119,7 +119,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(filepath, responseBody.get("filepath"));
 
@@ -130,7 +130,7 @@ public class TestLoadCSVHandler {
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
     responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(filepath, responseBody.get("filepath"));
 
@@ -269,7 +269,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -283,7 +283,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(filepath, responseBody.get("filepath"));
 

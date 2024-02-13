@@ -458,6 +458,109 @@ public class TestSearchCSVHandler {
   }
 
   @Test
+  public void testSearchColumnSpecifierNoIdentifier() throws IOException {
+    String filepath = "data/stars/ten-star.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+
+    String toSearch = "0";
+    String columnSpecifier = "index";
+    String hasHeaders = "false";
+    String params =
+        "toSearch="
+            + toSearch
+            + "&hasHeaders="
+            + hasHeaders
+            + "&columnSpecifier="
+            + columnSpecifier;
+    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
+
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+    assertEquals("error_bad_request", responseBody.get("result"));
+
+    searchConnection.disconnect();
+    loadConnection.disconnect();
+  }
+
+  @Test
+  public void testSearchColumnIdentifierNoSpecifier() throws IOException {
+    String filepath = "data/stars/ten-star.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+
+    String toSearch = "0";
+    String columnIdentifier = "0";
+    String hasHeaders = "false";
+    String params =
+        "toSearch="
+            + toSearch
+            + "&hasHeaders="
+            + hasHeaders
+            + "&columnIdentifier="
+            + columnIdentifier;
+    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
+
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+    assertEquals("error_bad_request", responseBody.get("result"));
+
+    searchConnection.disconnect();
+    loadConnection.disconnect();
+  }
+
+  @Test
+  public void testSearchColumnNoHasHeaders() throws IOException {
+    String filepath = "data/stars/ten-star.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+
+    String toSearch = "0";
+    String params = "toSearch=" + toSearch;
+    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
+
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+    assertEquals("error_bad_request", responseBody.get("result"));
+
+    searchConnection.disconnect();
+    loadConnection.disconnect();
+  }
+
+  @Test
+  public void testSearchColumnNoColumnSpecification() throws IOException {
+    String filepath = "data/stars/ten-star.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+
+    String toSearch = "0";
+    String params = "toSearch=" + toSearch + "&hasHeaders=" + "true";
+    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
+
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+    List<List<String>> result = new ArrayList<>();
+    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+    assertEquals("success", responseBody.get("result"));
+    assertEquals(result, responseBody.get("data"));
+
+    searchConnection.disconnect();
+    loadConnection.disconnect();
+  }
+
+  @Test
   public void testSearchColumnNotFound() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv

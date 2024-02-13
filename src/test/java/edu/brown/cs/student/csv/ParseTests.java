@@ -251,14 +251,6 @@ public class ParseTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"Caesar", " Julius", "", ""};
     expectedOutput.add(line);
-
-    for (String[] s : parser) {
-      System.out.println(s);
-    }
-
-    for (String[] s : parser) {
-      System.out.println(s);
-    }
   }
 
   @Test

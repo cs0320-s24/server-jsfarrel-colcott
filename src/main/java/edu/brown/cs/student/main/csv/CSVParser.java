@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -16,6 +17,7 @@ public class CSVParser<T> implements Iterable<T> {
   private CreatorFromRow<T> create;
 
   private List<T> parsed;
+  private List<T> public_parsed;
 
   private int index = 0;
 
@@ -63,7 +65,10 @@ public class CSVParser<T> implements Iterable<T> {
   }
 
   public List<T> getParsed() {
-    return this.parsed;
+    if (this.public_parsed == null) {
+      this.public_parsed = Collections.unmodifiableList(this.parsed);
+    }
+    return this.public_parsed;
   }
 
   /**
@@ -74,7 +79,7 @@ public class CSVParser<T> implements Iterable<T> {
    * @throws FactoryFailureException if failure creating row
    * @throws IllegalArgumentException if invalid CSV file
    */
-  public List<T> parse() throws IOException, FactoryFailureException, IllegalArgumentException {
+  private List<T> parse() throws IOException, FactoryFailureException, IllegalArgumentException {
     List<T> rows = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(reader);
 

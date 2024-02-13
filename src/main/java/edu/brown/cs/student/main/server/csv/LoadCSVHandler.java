@@ -15,15 +15,15 @@ import spark.Response;
 import spark.Route;
 
 /**
- * LoadCSVHandler
- * Handles requests to loadcsv endpoint.
- * Takes in params: filepath and saves parse to ParserState.
+ * LoadCSVHandler Handles requests to loadcsv endpoint. Takes in params: filepath and saves parse to
+ * ParserState.
  */
 public class LoadCSVHandler implements Route {
   private final ParserState parserState;
 
   /**
    * LoadCSVHandler constructor saves ParserState
+   *
    * @param parserState is the parser for the server
    */
   public LoadCSVHandler(ParserState parserState) {
@@ -32,24 +32,32 @@ public class LoadCSVHandler implements Route {
 
   /**
    * handle manages request and response to endpoint
-   * @param request is the request to the endpoint. Includes filepath parameter which must be defined.
+   *
+   * @param request is the request to the endpoint. Includes filepath parameter which must be
+   *     defined.
    * @param response is the response from the endpoint
    * @return Object response to request
    */
   @Override
   public Object handle(Request request, Response response) {
     String filepath = request.queryParams("filepath");
-    if (filepath == null) {
-      return ResponseBuilder.buildException(400, "Must specify filepath in endpoint.");
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("filepath", filepath);
+    if (filepath == null || filepath.isEmpty()) {
+      return ResponseBuilder.buildException(
+          "error_bad_request", 400, "Must specify filepath in endpoint.", paramMap);
     }
 
     if (!(filepath.startsWith("data/")) || filepath.contains("/..") || filepath.contains("../")) {
       return ResponseBuilder.buildException(
-          400, "Illegal file path. File must be in the data folder.");
+          "error_datasource", 400, "Illegal file path. File must be in the data folder.", paramMap);
     }
     if (!filepath.endsWith(".csv")) {
       return ResponseBuilder.buildException(
-          400, "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').");
+          "error_datasource",
+          400,
+          "Filepath didn't lead to a CSV file (make sure file path ends in '.csv').",
+          paramMap);
     }
 
     try {
@@ -57,19 +65,21 @@ public class LoadCSVHandler implements Route {
       CreatorFromRow<String[]> creator = row -> row.toArray(new String[0]);
       this.parserState.setParser(new CSVParser(reader, creator));
     } catch (FileNotFoundException e) {
-      return ResponseBuilder.buildException(404, "File not found.");
+      return ResponseBuilder.buildException("error_datasource", 404, "File not found.", paramMap);
     } catch (FactoryFailureException e) {
       return ResponseBuilder.buildException(
-          400, "File has inconsistent number of entries in columns.");
+          "error_datasource", 400, "File has inconsistent number of entries in columns.", paramMap);
     } catch (IOException e) {
-      return ResponseBuilder.buildException(400, "Unable to read from file.");
+      return ResponseBuilder.buildException(
+          "error_datasource", 400, "Unable to read from file.", paramMap);
     } catch (IllegalArgumentException e) {
-      return ResponseBuilder.buildException(400, "Malformed CSV data.");
+      return ResponseBuilder.buildException(
+          "error_datasource", 400, "Malformed CSV data.", paramMap);
     }
 
     // create response
     Map<String, Object> responseMap = new HashMap<>();
-    responseMap.put("type", "success");
+    responseMap.put("result", "success");
     responseMap.put("code", 200);
     responseMap.put("filepath", filepath);
     return ResponseBuilder.mapToJson(responseMap);

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import okio.Buffer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,13 @@ public class TestBroadbandHandler {
     // Gracefully stop Spark listening on both endpoints
     Spark.unmap("/broadband");
     Spark.awaitStop(); // don't proceed until the server is stopped
+  }
+
+  @AfterAll
+  public static void shutDown() throws InterruptedException {
+    // Gracefully stop Spark listening on both endpoints
+    Spark.stop();
+    Thread.sleep(3000); // don't proceed until the server is stopped
   }
 
   /**
@@ -85,7 +93,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(50.0, responseBody.get("percent"));
     assertEquals(state, responseBody.get("state"));
@@ -105,7 +113,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     assertEquals(50.0, responseBody.get("percent"));
     assertEquals(state, responseBody.get("state"));
@@ -124,7 +132,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     broadbandConnection.disconnect();
   }
@@ -139,7 +147,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     broadbandConnection.disconnect();
   }
@@ -151,7 +159,7 @@ public class TestBroadbandHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     broadbandConnection.disconnect();
   }

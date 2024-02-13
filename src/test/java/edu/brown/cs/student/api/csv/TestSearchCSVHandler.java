@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import okio.Buffer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +67,13 @@ public class TestSearchCSVHandler {
     Spark.unmap("/loadcsv");
     Spark.unmap("/searchcsv");
     Spark.awaitStop(); // don't proceed until the server is stopped
+  }
+
+  @AfterAll
+  public static void shutDown() throws InterruptedException {
+    // Gracefully stop Spark listening on both endpoints
+    Spark.stop();
+    Thread.sleep(3000); // don't proceed until the server is stopped
   }
 
   /**
@@ -117,11 +125,11 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("results"));
+    assertEquals(result, responseBody.get("data"));
 
     loadConnection.disconnect();
     searchConnection.disconnect();
@@ -152,11 +160,11 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("results"));
+    assertEquals(result, responseBody.get("data"));
 
     searchConnection.disconnect();
 
@@ -164,9 +172,9 @@ public class TestSearchCSVHandler {
 
     responseBody = this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
-    assertEquals(result, responseBody.get("results"));
+    assertEquals(result, responseBody.get("data"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -197,11 +205,11 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("results"));
+    assertEquals(result, responseBody.get("data"));
 
     loadConnection.disconnect();
     searchConnection.disconnect();
@@ -215,9 +223,9 @@ public class TestSearchCSVHandler {
 
     responseBody = this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
-    assertEquals(result, responseBody.get("results"));
+    assertEquals(result, responseBody.get("data"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -244,7 +252,7 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_json", responseBody.get("result"));
 
     searchConnection.disconnect();
   }
@@ -277,8 +285,8 @@ public class TestSearchCSVHandler {
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("70667", "Proxima Centauri", "-0.47175", "-0.36132", "-1.15037"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -315,8 +323,8 @@ public class TestSearchCSVHandler {
     result.add(Arrays.asList("2", "", "43.04329", "0.00285", "-15.24144"));
     result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
     result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -350,8 +358,8 @@ public class TestSearchCSVHandler {
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -375,8 +383,8 @@ public class TestSearchCSVHandler {
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -407,8 +415,8 @@ public class TestSearchCSVHandler {
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -442,8 +450,8 @@ public class TestSearchCSVHandler {
     showDetailsIfError(responseBody);
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -475,7 +483,7 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -507,12 +515,12 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("type"));
+    assertEquals("success", responseBody.get("result"));
 
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("Barrington", "\"130,455.00\"", "\"154,441.00\"", "\"69,917.00\""));
-    assertEquals(result, responseBody.get("results"));
-    assertEquals("success", responseBody.get("type"));
+    assertEquals(result, responseBody.get("data"));
+    assertEquals("success", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();

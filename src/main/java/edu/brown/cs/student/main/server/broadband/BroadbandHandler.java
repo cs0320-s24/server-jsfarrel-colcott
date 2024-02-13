@@ -12,9 +12,8 @@ import spark.Response;
 import spark.Route;
 
 /**
- * BroadbandHandler
- * Handles requests to broadband endpoint.
- * Takes in params: state, county and saves source in BroadbandSource.
+ * BroadbandHandler Handles requests to broadband endpoint. Takes in params: state, county and saves
+ * source in BroadbandSource.
  */
 public class BroadbandHandler implements Route {
 
@@ -22,6 +21,7 @@ public class BroadbandHandler implements Route {
 
   /**
    * BroadbandHandler constructor saves BroadbandSource
+   *
    * @param source is a BroadbandSource where we get broadband data from
    */
   public BroadbandHandler(BroadbandSource source) {
@@ -30,6 +30,7 @@ public class BroadbandHandler implements Route {
 
   /**
    * handle manages request and response to endpoint
+   *
    * @param request is the request to the endpoint. Includes state and county which must be defined.
    * @param response is the response from the endpoint
    * @return Object response to request
@@ -37,10 +38,13 @@ public class BroadbandHandler implements Route {
   public Object handle(Request request, Response response) {
     String state = request.queryParams("state");
     String county = request.queryParams("county");
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("state", state);
+    paramMap.put("county", county);
 
     if (state == null || county == null) {
       return ResponseBuilder.buildException(
-          400, "Missing params. Please include state and county.");
+          "error_bad_request", 400, "Missing params. Please include state and county.", paramMap);
     }
 
     try {
@@ -54,11 +58,14 @@ public class BroadbandHandler implements Route {
       SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
       dateFormat.setTimeZone(TimeZone.getTimeZone("EST"));
       responseMap.put("date", dateFormat.format(new Date()) + " EST");
-      responseMap.put("type", "success");
+      responseMap.put("result", "success");
       responseMap.put("code", 200);
+      for (String key : paramMap.keySet()) {
+        responseMap.put(key, paramMap.get(key));
+      }
       return ResponseBuilder.mapToJson(responseMap);
     } catch (DatasourceException e) {
-      return ResponseBuilder.buildException(400, e.getMessage());
+      return ResponseBuilder.buildException("error_datasource", 400, e.getMessage(), paramMap);
     }
   }
 }

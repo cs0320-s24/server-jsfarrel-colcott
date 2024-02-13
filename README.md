@@ -19,11 +19,11 @@ The program is a backend server built on Spark. It has for GET endpoints: `broad
 
 Endpoint design choices:
 - `GET /broadband`
-    - The handler takes in a `BroadbandSource`, a strategy pattern to allow developers to determine how
-    data is obtained about the broadband coverage of a county.
-    - All parameters must be defined, or an error will be returned (county and state).
-    - A timestamp (in form `SimpleDateFormat`) from EST time zone is included with response
-    - State and county is included in response.
+  - The handler takes in a `BroadbandSource`, a strategy pattern to allow developers to determine how
+  data is obtained about the broadband coverage of a county.
+  - All parameters must be defined, or an error will be returned (county and state).
+  - A timestamp (in form `SimpleDateFormat`) from EST time zone is included with response
+  - State and county is included in response.
 - `GET /loadcsv`
     - The handler takes in a `ParserState`, a class to manage a `CSVParser` among all endpoints to ensure
       there is only one existing parser for all endpoints. `ParserState` simply contains a `CSVParser` and
@@ -83,6 +83,22 @@ The program also includes a CSV search and parse functionality, split into two C
           the split line is entered to the row constructor, and the result is added to a list.
           The list of constructed rows is returned.
 
+## Cache Configuration
+
+- To use the cache, surround an endpoint handler in a `new APICache()`. The `APICache` has two inputs, 
+  the endpoint handler of type `Route` and a `CacheBuilder`. The `CacheBuilder` is where configuration
+  of eviction policies go. The `APICache` acts as a proxy to the given `Route`. `APICache` builds a 
+  Guava cache using the given `CacheBuilder` and configures the `load()` function to take in a `Request` and return
+  the response of calling the given `Route.handle()`.
+- By default, there is a 30-second cache of requests and responses to the `GET /broadband` endpoint.
+  This default can be modified in `Server.java`:
+  ```java
+    CacheBuilder<Object, Object> cacheBuilder =
+    CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
+    
+    // Setting up the handler for the GET /loadcsv, /viewcsv, /searchcsv, /broadband
+    Spark.get("broadband", new APICache(new BroadbandHandler(new ACSBroadbandSource()), cacheBuilder));
+  ```
 
 # Errors/Bugs
 
@@ -114,3 +130,22 @@ Starts the server, URL/port printed to terminal:
 mvn package
 ./run
 ```
+
+## Use Endpoints
+
+- `GET /broadband`
+  - `state`: the state to search for percent broadband coverage within.
+  - `county`: the county to search for percent broadband coverage within.
+  - Response has `percent` field containing the percent broadband coverage within the specified county.
+- `GET /loadcsv`
+  - `filepath`: the filepath to load a CSV from. Must be within the data directory. Must be defined.
+  - Response returns `result:success` if loaded successfully. 
+- `GET /viewcsv`
+  - No params.
+  - Response has `data` field containing an array of CSV rows.
+- `GET /searchcsv`
+  - `toSearch`: the value being searched for in CSV. Must be defined.
+  - `hasHeaders`: `"true"` if CSV has headers, `"false"` if CSV doesn't have headers. Must be defined.
+  - `columnSpecifier`: `"name"` if specifying for a column by name, `index` if specifying for a column by index. Must be defined if `columnIdentifier` is defined.
+  - `columnIdentifier`: the value representing the column to search for `toSearch` within. Must be defined if `columnSpecifier` is defined.
+  - Response has `data` field containing an array of CSV rows that are valid search results. Not specifying a `columnSpecifier` or `columnIdentifier` will search for `toSearch` in all columns.

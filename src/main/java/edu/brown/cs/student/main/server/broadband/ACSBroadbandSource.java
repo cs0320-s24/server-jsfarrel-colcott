@@ -9,7 +9,9 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import okio.Buffer;
 
 /**
@@ -18,7 +20,98 @@ import okio.Buffer;
  */
 public class ACSBroadbandSource implements BroadbandSource {
 
-  private List<List<String>> states;
+  /** Map with keys = state names, values = state ids */
+  private Map<String, String> states;
+
+  private Moshi moshi = new Moshi.Builder().build();
+  private Type listType = Types.newParameterizedType(List.class, List.class, String.class);
+  private JsonAdapter<List<List<String>>> listJsonAdapter = moshi.adapter(listType);
+
+  /**
+   * fetchStateIds is a helper function fetch state id and define state name to id map if undefined
+   *
+   * @param state is String representation of state name
+   * @return List of State
+   * @throws Exception that may occur while fetching from census api, or an exception if state input
+   *     is not valid
+   */
+  private String fetchState(String state) throws Exception {
+    // create state map if undefined
+    if (this.states == null) {
+      // Endpoint for state ids:
+      // https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*
+      URL requestURL =
+          new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
+      HttpURLConnection clientConnection = connect(requestURL);
+      List<List<String>> states =
+          this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+
+      Map<String, String> statesMap = new HashMap<>();
+      for (List<String> stateStateId : states) {
+        // skips header
+        if (!stateStateId.get(0).equals("NAME")) {
+          statesMap.put(stateStateId.get(0), stateStateId.get(1));
+        }
+      }
+
+      this.states = statesMap;
+    }
+
+    String stateId = this.states.get(state);
+    if (stateId == null) {
+      throw new DatasourceException("State input not valid");
+    }
+
+    return stateId;
+  }
+
+  /**
+   * fetchCountyId is a helper function to get a county id from
+   *
+   * @param stateId is the stateId of the which the county is in
+   * @param countyName is the String of the county searching for
+   * @return String representation of county id
+   */
+  private String fetchCountyId(String stateId, String countyName) throws Exception {
+    URL requestURL =
+        new URL(
+            "https",
+            "api.census.gov",
+            "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + stateId);
+    HttpURLConnection clientConnection = connect(requestURL);
+    ;
+    List<List<String>> counties =
+        this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+
+    for (List<String> countyCountyId : counties) {
+      if (countyCountyId.get(0).startsWith(countyName + " County, ")) {
+        return countyCountyId.get(2);
+      }
+    }
+
+    throw new DatasourceException("County input not valid");
+  }
+
+  private double fetchPercentBroadband(String stateId, String countyId) throws Exception {
+    URL requestURL =
+        new URL(
+            "https",
+            "api.census.gov",
+            "/data/2022/acs/acs1/subject?get=NAME,S2801_C01_014E,S2801_C01_001E&for=county:"
+                + countyId
+                + "&in=state:"
+                + stateId);
+    HttpURLConnection clientConnection = connect(requestURL);
+
+    List<List<String>> broadBandResponse =
+        this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+
+    String broadbandHouseholds = broadBandResponse.get(1).get(1);
+    String totalHouseholds = broadBandResponse.get(1).get(2);
+
+    // todo: is there better source for this
+    return 100.0 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
+  }
 
   /**
    * getBroadBand returns BroadbandData (percent broadband coverage) for a state and county
@@ -30,82 +123,15 @@ public class ACSBroadbandSource implements BroadbandSource {
    */
   @Override
   public BroadbandData getBroadBand(String state, String county) throws DatasourceException {
-    // todo: cleanup
     try {
-      // Endpoint for state ids:
-      // https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*
-      URL requestURL =
-          new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
-      HttpURLConnection clientConnection = connect(requestURL);
-      Moshi moshi = new Moshi.Builder().build();
-      Type listType = Types.newParameterizedType(List.class, List.class, String.class);
+      String stateId = fetchState(state);
 
-      JsonAdapter<List<List<String>>> listJsonAdapter = moshi.adapter(listType);
+      String countyId = fetchCountyId(stateId, county);
 
-      String stateId = "-1";
-      if (this.states == null) {
-        this.states =
-            listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        if (this.states == null) {
-          throw new DatasourceException("Failed to fetch state codes");
-        }
-      }
-      for (List<String> stateSpecification : this.states) {
-        if (state.equals(stateSpecification.get(0))) {
-          stateId = stateSpecification.get(1);
-        }
-      }
-      if (stateId.equals("-1")) {
-        throw new DatasourceException("Invalid state input");
-      }
-
-      // Get counties from state id
-      requestURL =
-          new URL(
-              "https",
-              "api.census.gov",
-              "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + stateId);
-      clientConnection = connect(requestURL);
-
-      String countyId = "-1";
-      List<List<String>> counties =
-          listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-      if (counties == null) {
-        throw new DatasourceException("Failed to fetch county codes");
-      }
-      for (List<String> countySpecification : counties) {
-        if (countySpecification.get(0).equals(county + " County, " + state)) {
-          countyId = countySpecification.get(2);
-        }
-      }
-      if (stateId.equals("-1")) {
-        throw new DatasourceException("Invalid county input");
-      }
-      // Endpoint for getting info from county:
-      // https://api.census.gov/data/2022/acs/acs1/subject?get=x&for=state:y,county:z
-      requestURL =
-          new URL(
-              "https",
-              "api.census.gov",
-              "/data/2022/acs/acs1/subject?get=NAME,S2801_C01_014E,S2801_C01_001E&for=county:"
-                  + countyId
-                  + "&in=state:"
-                  + stateId);
-      clientConnection = connect(requestURL);
-      List<List<String>> broadBandResponse =
-          listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-      // broadbandHouseholds labeled as: S2801_C01_014E
-      String broadbandHouseholds = broadBandResponse.get(1).get(1);
-      // totalHouseholds labeled as: S2801_C01_001E
-      String totalHouseholds = broadBandResponse.get(1).get(2);
-
-      // todo: check if there's a better way to get this information/a datapoint that is already
-      //  what we are looking for
-      double percentBroadband =
-          100.0 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
+      double percentBroadband = fetchPercentBroadband(stateId, countyId);
 
       return new BroadbandData(percentBroadband);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new DatasourceException(e.getMessage(), e);
     }
   }

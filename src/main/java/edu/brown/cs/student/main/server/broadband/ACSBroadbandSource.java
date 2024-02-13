@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,6 @@ public class ACSBroadbandSource implements BroadbandSource {
       HttpURLConnection clientConnection = connect(requestURL);
       List<List<String>> states =
           this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-
       Map<String, String> statesMap = new HashMap<>();
       for (List<String> stateStateId : states) {
         // skips header
@@ -59,7 +59,10 @@ public class ACSBroadbandSource implements BroadbandSource {
 
     String stateId = this.states.get(state);
     if (stateId == null) {
-      throw new DatasourceException("State input not valid");
+      Map<String, Object> helperFields = new HashMap<>();
+      List<String> validStates = new ArrayList<>(this.states.keySet());
+      helperFields.put("valid-states", validStates);
+      throw new DatasourceException("State input not valid", helperFields);
     }
 
     return stateId;
@@ -82,14 +85,19 @@ public class ACSBroadbandSource implements BroadbandSource {
     ;
     List<List<String>> counties =
         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-
+    List<String> validCounties = new ArrayList<>();
     for (List<String> countyCountyId : counties) {
-      if (countyCountyId.get(0).startsWith(countyName + " County, ")) {
-        return countyCountyId.get(2);
+      if (!countyCountyId.get(0).equals("NAME")) {
+        validCounties.add(countyCountyId.get(0));
+        if (countyCountyId.get(0).startsWith(countyName + " County, ")) {
+          return countyCountyId.get(2);
+        }
       }
     }
 
-    throw new DatasourceException("County input not valid");
+    Map<String, Object> helperFields = new HashMap<>();
+    helperFields.put("valid-counties", validCounties);
+    throw new DatasourceException("County input not valid", helperFields);
   }
 
   private double fetchPercentBroadband(String stateId, String countyId) throws Exception {
@@ -105,7 +113,6 @@ public class ACSBroadbandSource implements BroadbandSource {
 
     List<List<String>> broadBandResponse =
         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-
     String broadbandHouseholds = broadBandResponse.get(1).get(1);
     String totalHouseholds = broadBandResponse.get(1).get(2);
 
@@ -131,6 +138,8 @@ public class ACSBroadbandSource implements BroadbandSource {
       double percentBroadband = fetchPercentBroadband(stateId, countyId);
 
       return new BroadbandData(percentBroadband);
+    } catch (DatasourceException e) {
+      throw new DatasourceException(e.getMessage(), e.getHelperFields(), e);
     } catch (Exception e) {
       throw new DatasourceException(e.getMessage(), e);
     }

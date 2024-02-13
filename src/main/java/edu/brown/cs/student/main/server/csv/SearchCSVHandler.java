@@ -6,6 +6,7 @@ import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.exception.FactoryFailureException;
 import edu.brown.cs.student.main.server.ResponseBuilder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import spark.Request;
 import spark.Response;
@@ -18,6 +19,7 @@ import spark.Route;
 public class SearchCSVHandler implements Route {
   private final ParserState parserState;
   private ColumnSpecified columnSpecifier;
+  private List<String> columnHeaders;
 
   /**
    * SearchCSVHandler constructor saves ParserState
@@ -44,6 +46,13 @@ public class SearchCSVHandler implements Route {
     }
     if (headerParam == null) {
       return new StatusCode(400, "No header value provided.");
+    }
+
+    if (!headerParam.equals("false") && !headerParam.equals("true")) {
+      return new StatusCode(400, "hasHeaders param must equal true or false.");
+    }
+    if (headerParam.equals("false") && columnSpecifierString == "name") {
+      return new StatusCode(400, "hasHeaders must be true for columnSpecifier to be name.");
     }
     if (columnSpecifierString == null) {
       if (columnIdentifier == null) {
@@ -119,6 +128,9 @@ public class SearchCSVHandler implements Route {
       }
       boolean hasHeaders = headerParam.equals("true");
       CSVSearcher searcher = new CSVSearcher(this.parserState.getParser(), hasHeaders);
+      if (hasHeaders) {
+        this.columnHeaders = searcher.getColumHeaders();
+      }
       Map<String, Object> responseMap = new HashMap<>();
       responseMap.put("code", 200);
       responseMap.put("result", "success");
@@ -131,6 +143,9 @@ public class SearchCSVHandler implements Route {
       return ResponseBuilder.buildException(
           "error_datasource", 400, "File has inconsistent number of entries in columns.", paramMap);
     } catch (IllegalArgumentException e) {
+      if (e.getMessage().equals("Column not found.")) {
+        paramMap.put("valid-columns", this.columnHeaders);
+      }
       return ResponseBuilder.buildException("error_bad_request", 400, e.getMessage(), paramMap);
     }
   }

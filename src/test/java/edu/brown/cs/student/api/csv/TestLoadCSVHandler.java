@@ -138,7 +138,7 @@ public class TestLoadCSVHandler {
   }
 
   @Test
-  public void testLoadDataNonExistantCSV() throws IOException {
+  public void testLoadDataNonExistentCSV() throws IOException {
     String filepath = "data/stars/nonexistantcsv.csv";
     // request loadcsv
     HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);

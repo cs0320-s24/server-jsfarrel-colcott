@@ -8,9 +8,7 @@ public final class Main {
    *
    * @param args An array of command line arguments
    */
-  public static void main(String[] args) {
-
-  }
+  public static void main(String[] args) {}
 
   private Main(String[] args) {}
 }

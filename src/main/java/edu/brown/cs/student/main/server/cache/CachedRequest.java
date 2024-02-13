@@ -1,6 +1,5 @@
 package edu.brown.cs.student.main.server.cache;
 
-import java.util.Set;
 import spark.Request;
 
 // src:
@@ -11,7 +10,7 @@ import spark.Request;
 public class CachedRequest extends Request {
 
   private Request request;
-  private Set<String> params;
+  private String paramsIdentifier;
 
   /**
    * Create CachedRequest
@@ -20,7 +19,12 @@ public class CachedRequest extends Request {
    */
   public CachedRequest(Request request) {
     this.request = request;
-    this.params = request.queryParams();
+
+    String s = "";
+    for (String param : request.queryParams()) {
+      s += param + request.queryParams(param);
+    }
+    this.paramsIdentifier = s;
   }
 
   /**
@@ -40,7 +44,7 @@ public class CachedRequest extends Request {
    */
   @Override
   public int hashCode() {
-    return this.params.hashCode();
+    return this.paramsIdentifier.hashCode();
   }
 
   /**
@@ -61,6 +65,6 @@ public class CachedRequest extends Request {
       return false;
     }
     CachedRequest o = (CachedRequest) obj;
-    return o.params.equals(this.params);
+    return o.paramsIdentifier.equals(this.paramsIdentifier);
   }
 }

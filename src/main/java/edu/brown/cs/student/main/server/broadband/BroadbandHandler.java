@@ -65,6 +65,9 @@ public class BroadbandHandler implements Route {
       }
       return ResponseBuilder.mapToJson(responseMap);
     } catch (DatasourceException e) {
+      if (e.getHelperFields() != null) {
+        paramMap.putAll(e.getHelperFields());
+      }
       return ResponseBuilder.buildException("error_datasource", 400, e.getMessage(), paramMap);
     }
   }

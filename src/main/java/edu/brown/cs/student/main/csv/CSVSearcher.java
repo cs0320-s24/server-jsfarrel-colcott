@@ -3,6 +3,8 @@ package edu.brown.cs.student.main.csv;
 import edu.brown.cs.student.main.exception.FactoryFailureException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CSVSearcher {
@@ -43,6 +45,15 @@ public class CSVSearcher {
       }
       this.header = this.rows.get(0);
     }
+  }
+
+  /**
+   * getColumHeaders is used to get a list of column headers
+   *
+   * @return a list of column headers
+   */
+  public List<String> getColumHeaders() {
+    return Collections.unmodifiableList(Arrays.asList(this.header));
   }
 
   /**
@@ -90,7 +101,8 @@ public class CSVSearcher {
 
     for (int i = 0; i < numCols; i++) {
       // if didn't specify column, add all indexes
-      if (specification == ColumnSpecified.UNSPECIFIED || this.header[i].equals(column)) {
+      if (specification == ColumnSpecified.UNSPECIFIED
+          || (this.header.length == this.numCols && this.header[i].equals(column))) {
         columnIndexes.add(i);
       }
     }

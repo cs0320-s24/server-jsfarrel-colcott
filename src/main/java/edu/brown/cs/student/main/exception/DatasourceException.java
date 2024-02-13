@@ -1,6 +1,9 @@
 package edu.brown.cs.student.main.exception;
 
 // src: feb08_nws_api CS32 live code
+
+import java.util.Map;
+
 /**
  * This exception communicates that something went wrong with a requested datasource. It _wraps_ the
  * original cause as a field, which helps with debugging, but also allows the caller to handle the
@@ -9,6 +12,19 @@ package edu.brown.cs.student.main.exception;
 public class DatasourceException extends Exception {
   // The root cause of this datasource problem
   private final Throwable cause;
+  private Map<String, Object> helperFields;
+
+  public DatasourceException(String message, Map<String, Object> helperFields, Throwable cause) {
+    super(message); // Exception message
+    this.helperFields = helperFields;
+    this.cause = cause;
+  }
+
+  public DatasourceException(String message, Map<String, Object> helperFields) {
+    super(message); // Exception message
+    this.helperFields = helperFields;
+    this.cause = null;
+  }
 
   public DatasourceException(String message) {
     super(message); // Exception message
@@ -29,5 +45,14 @@ public class DatasourceException extends Exception {
    */
   public Throwable getCause() {
     return this.cause;
+  }
+
+  /**
+   * Returns helper fields (if any) which can help the user figure out what was the issue
+   *
+   * @return the fields to help user solve the issue
+   */
+  public Map getHelperFields() {
+    return this.helperFields;
   }
 }

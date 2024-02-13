@@ -458,6 +458,39 @@ public class TestSearchCSVHandler {
   }
 
   @Test
+  public void testSearchBigIndexNoHeader() throws IOException {
+    String filepath = "data/stars/ten-star.csv";
+    // request loadcsv
+    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+
+    String toSearch = "0";
+    String columnSpecifier = "index";
+    String columnIdentifier = "8888";
+    String hasHeaders = "false";
+    String params =
+        "toSearch="
+            + toSearch
+            + "&hasHeaders="
+            + hasHeaders
+            + "&columnSpecifier="
+            + columnSpecifier
+            + "&columnIdentifier="
+            + columnIdentifier;
+    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
+
+    Map<String, Object> responseBody =
+        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
+    showDetailsIfError(responseBody);
+    List<List<String>> result = new ArrayList<>();
+    assertEquals("error_bad_request", responseBody.get("result"));
+
+    searchConnection.disconnect();
+    loadConnection.disconnect();
+  }
+
+  @Test
   public void testSearchColumnSpecifierNoIdentifier() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv

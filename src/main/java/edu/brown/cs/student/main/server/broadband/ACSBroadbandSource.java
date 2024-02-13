@@ -13,9 +13,8 @@ import java.util.List;
 import okio.Buffer;
 
 /**
- * ACSBroadbandSource
- * Uses the ACS API to get information about broadband coverage in given county, state
- * Takes in params: state, county
+ * ACSBroadbandSource Uses the ACS API to get information about broadband coverage in given county,
+ * state Takes in params: state, county
  */
 public class ACSBroadbandSource implements BroadbandSource {
 
@@ -23,6 +22,7 @@ public class ACSBroadbandSource implements BroadbandSource {
 
   /**
    * getBroadBand returns BroadbandData (percent broadband coverage) for a state and county
+   *
    * @param state is String representation of state we are looking for broadband coverage of
    * @param county is String representation of county we are looking for broadband coverage of
    * @return BroadbandData from ACS API for result

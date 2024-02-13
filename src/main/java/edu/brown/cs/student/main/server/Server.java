@@ -14,9 +14,8 @@ import java.util.concurrent.TimeUnit;
 import spark.Spark;
 
 /**
- * Main class for initializing a server.
- * Includes 4 endpoints: /broadband, /loadcsv, /viewcsv, /searchcsv
- * Run Server.main to start and initialize server.
+ * Main class for initializing a server. Includes 4 endpoints: /broadband, /loadcsv, /viewcsv,
+ * /searchcsv Run Server.main to start and initialize server.
  */
 public class Server {
   public static void main(String[] args) {

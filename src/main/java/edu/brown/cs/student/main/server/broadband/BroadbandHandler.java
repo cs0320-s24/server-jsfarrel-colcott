@@ -12,9 +12,8 @@ import spark.Response;
 import spark.Route;
 
 /**
- * BroadbandHandler
- * Handles requests to broadband endpoint.
- * Takes in params: state, county and saves source in BroadbandSource.
+ * BroadbandHandler Handles requests to broadband endpoint. Takes in params: state, county and saves
+ * source in BroadbandSource.
  */
 public class BroadbandHandler implements Route {
 
@@ -22,6 +21,7 @@ public class BroadbandHandler implements Route {
 
   /**
    * BroadbandHandler constructor saves BroadbandSource
+   *
    * @param source is a BroadbandSource where we get broadband data from
    */
   public BroadbandHandler(BroadbandSource source) {
@@ -30,6 +30,7 @@ public class BroadbandHandler implements Route {
 
   /**
    * handle manages request and response to endpoint
+   *
    * @param request is the request to the endpoint. Includes state and county which must be defined.
    * @param response is the response from the endpoint
    * @return Object response to request
@@ -40,7 +41,7 @@ public class BroadbandHandler implements Route {
 
     if (state == null || county == null) {
       return ResponseBuilder.buildException(
-          400, "Missing params. Please include state and county.");
+          "error_bad_request", 400, "Missing params. Please include state and county.");
     }
 
     try {
@@ -58,7 +59,7 @@ public class BroadbandHandler implements Route {
       responseMap.put("code", 200);
       return ResponseBuilder.mapToJson(responseMap);
     } catch (DatasourceException e) {
-      return ResponseBuilder.buildException(400, e.getMessage());
+      return ResponseBuilder.buildException("error_datasource", 400, e.getMessage());
     }
   }
 }

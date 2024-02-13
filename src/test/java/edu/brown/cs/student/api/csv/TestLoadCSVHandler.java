@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import okio.Buffer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +61,13 @@ public class TestLoadCSVHandler {
     // Gracefully stop Spark listening on both endpoints
     Spark.unmap("/loadcsv");
     Spark.awaitStop(); // don't proceed until the server is stopped
+  }
+
+  @AfterAll
+  public static void shutDown() throws InterruptedException {
+    // Gracefully stop Spark listening on both endpoints
+    Spark.stop();
+    Thread.sleep(3000); // don't proceed until the server is stopped
   }
 
   /**
@@ -139,7 +147,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -154,7 +162,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -169,7 +177,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -184,7 +192,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
 
@@ -194,7 +202,7 @@ public class TestLoadCSVHandler {
 
     responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
 
@@ -204,7 +212,7 @@ public class TestLoadCSVHandler {
 
     responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_datasource", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -218,7 +226,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -232,7 +240,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     loadConnection.disconnect();
   }
@@ -246,7 +254,7 @@ public class TestLoadCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     loadConnection.disconnect();
   }

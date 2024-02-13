@@ -15,6 +15,7 @@ public class CachedRequest extends Request {
 
   /**
    * Create CachedRequest
+   *
    * @param request is request to proxy
    */
   public CachedRequest(Request request) {
@@ -24,6 +25,7 @@ public class CachedRequest extends Request {
 
   /**
    * Re-implement queryParams for proxy
+   *
    * @param key is a parameter with a value attached
    * @return value attached to key
    */
@@ -33,6 +35,7 @@ public class CachedRequest extends Request {
 
   /**
    * Override hashCode so hashed by just Request params
+   *
    * @return integer hash code
    */
   @Override
@@ -42,6 +45,7 @@ public class CachedRequest extends Request {
 
   /**
    * Override equals so equality compared by Request params
+   *
    * @return true if equal to obj, false otherwise
    */
   @Override

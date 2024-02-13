@@ -9,15 +9,15 @@ import spark.Response;
 import spark.Route;
 
 /**
- * ViewCSVHandler
- * Handles requests to viewcsv endpoint.
- * Takes in no params and saves parse to ParserState.
+ * ViewCSVHandler Handles requests to viewcsv endpoint. Takes in no params and saves parse to
+ * ParserState.
  */
 public class ViewCSVHandler implements Route {
   private final ParserState parserState;
 
   /**
    * ViewCSVHandler constructor saves ParserState
+   *
    * @param parserState is the parser for the server
    */
   public ViewCSVHandler(ParserState parserState) {
@@ -26,6 +26,7 @@ public class ViewCSVHandler implements Route {
 
   /**
    * handle manages request and response to endpoint
+   *
    * @param request is the request to the endpoint
    * @param response is the response from the endpoint
    * @return Object response to request
@@ -34,7 +35,7 @@ public class ViewCSVHandler implements Route {
   public Object handle(Request request, Response response) {
     if (this.parserState.getParser() == null) {
       return ResponseBuilder.buildException(
-          400, "File has yet to be loaded. " + "You must first use loadcsv.");
+          "error_bad_json", 400, "File has yet to be loaded. " + "You must first use loadcsv.");
     }
     // create response
     Map<String, Object> responseMap = new HashMap<>();

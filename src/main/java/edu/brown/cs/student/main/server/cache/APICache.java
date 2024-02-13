@@ -7,15 +7,14 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-/**
- * APICache is a wrapper class to an endpoint handler.
- */
+/** APICache is a wrapper class to an endpoint handler. */
 public class APICache implements Route {
   private LoadingCache<CachedRequest, Object> requests;
 
   /**
-   * APICache constructor takes in Route and CacheBuilder.
-   * The cacheBuilder is built with load() going to route.handle().
+   * APICache constructor takes in Route and CacheBuilder. The cacheBuilder is built with load()
+   * going to route.handle().
+   *
    * @param route is the endpoint handler we are wrapping
    * @param cacheBuilder is the configuration for the cache
    */
@@ -32,6 +31,7 @@ public class APICache implements Route {
 
   /**
    * Handle request for a given endpoint. Redirects to the defined cache (and route if undefined).
+   *
    * @param request is the endpoint request
    * @param response is the endpoint response
    * @return Object in response to the request

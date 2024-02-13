@@ -12,10 +12,8 @@ import spark.Response;
 import spark.Route;
 
 /**
- * SearchCSVHandler
- * Handles requests to searchcsv endpoint.
- * Takes in params: toSearch, columnSpecifier, columnIdentifier, hasHeader
- * and saves parse to ParserState.
+ * SearchCSVHandler Handles requests to searchcsv endpoint. Takes in params: toSearch,
+ * columnSpecifier, columnIdentifier, hasHeader and saves parse to ParserState.
  */
 public class SearchCSVHandler implements Route {
   private final ParserState parserState;
@@ -23,6 +21,7 @@ public class SearchCSVHandler implements Route {
 
   /**
    * SearchCSVHandler constructor saves ParserState
+   *
    * @param parserState is the parser for the server
    */
   public SearchCSVHandler(ParserState parserState) {
@@ -31,6 +30,7 @@ public class SearchCSVHandler implements Route {
 
   /**
    * undefinedHandling determines whether there is an issue with the inputs to SearchCSVHandler
+   *
    * @param toSearch - the value being searched for
    * @param columnSpecifierString - the specification for column
    * @param columnIdentifier - the column being identified
@@ -87,6 +87,7 @@ public class SearchCSVHandler implements Route {
 
   /**
    * handle manages request and response to endpoint
+   *
    * @param request is the request to the endpoint. Includes searching params.
    * @param response is the response from the endpoint
    * @return Object response to request
@@ -95,7 +96,7 @@ public class SearchCSVHandler implements Route {
   public Object handle(Request request, Response response) {
     if (this.parserState.getParser() == null) {
       return ResponseBuilder.buildException(
-          400, "File has yet to be loaded. " + "You must first use loadcsv.");
+          "error_bad_json", 400, "File has yet to be loaded. " + "You must first use loadcsv.");
     }
     try {
       String toSearch = request.queryParams("toSearch");
@@ -105,7 +106,7 @@ public class SearchCSVHandler implements Route {
       StatusCode status =
           this.undefinedHandling(toSearch, columnSpecifierString, columnIdentifier, headerParam);
       if (status.code() != 200) {
-        return ResponseBuilder.buildException(status.code(), status.message());
+        return ResponseBuilder.buildException("error_bad_request", status.code(), status.message());
       }
       boolean hasHeaders = headerParam.equals("true");
       CSVSearcher searcher = new CSVSearcher(this.parserState.getParser(), hasHeaders);
@@ -116,9 +117,9 @@ public class SearchCSVHandler implements Route {
       return ResponseBuilder.mapToJson(responseMap);
     } catch (FactoryFailureException e) {
       return ResponseBuilder.buildException(
-          400, "File has inconsistent number of entries in columns.");
+          "error_datasource", 400, "File has inconsistent number of entries in columns.");
     } catch (IllegalArgumentException e) {
-      return ResponseBuilder.buildException(400, e.getMessage());
+      return ResponseBuilder.buildException("error_bad_request", 400, e.getMessage());
     }
   }
 }

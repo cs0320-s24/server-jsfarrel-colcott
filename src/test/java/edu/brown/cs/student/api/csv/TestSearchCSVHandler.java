@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import okio.Buffer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +67,13 @@ public class TestSearchCSVHandler {
     Spark.unmap("/loadcsv");
     Spark.unmap("/searchcsv");
     Spark.awaitStop(); // don't proceed until the server is stopped
+  }
+
+  @AfterAll
+  public static void shutDown() throws InterruptedException {
+    // Gracefully stop Spark listening on both endpoints
+    Spark.stop();
+    Thread.sleep(3000); // don't proceed until the server is stopped
   }
 
   /**
@@ -244,7 +252,7 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_json", responseBody.get("result"));
 
     searchConnection.disconnect();
   }
@@ -475,7 +483,7 @@ public class TestSearchCSVHandler {
     Map<String, Object> responseBody =
         this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
     showDetailsIfError(responseBody);
-    assertEquals("error", responseBody.get("type"));
+    assertEquals("error_bad_request", responseBody.get("result"));
 
     searchConnection.disconnect();
     loadConnection.disconnect();

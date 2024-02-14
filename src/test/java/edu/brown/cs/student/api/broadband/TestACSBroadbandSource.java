@@ -14,7 +14,6 @@ public class TestACSBroadbandSource {
     try {
       BroadbandData data = source.getBroadBand("California", "Kings");
       Assert.assertNotNull(data);
-      Assert.assertNotNull(data.percentBroadband());
       double percent = data.percentBroadband();
       Assert.assertTrue(percent >= 0.0);
       Assert.assertTrue(percent <= 100.0);

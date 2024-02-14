@@ -63,7 +63,7 @@ public class LoadCSVHandler implements Route {
     try {
       FileReader reader = new FileReader(filepath);
       CreatorFromRow<String[]> creator = row -> row.toArray(new String[0]);
-      this.parserState.setParser(new CSVParser(reader, creator));
+      this.parserState.setParser(new CSVParser<>(reader, creator));
     } catch (FileNotFoundException e) {
       return ResponseBuilder.buildException("error_datasource", 404, "File not found.", paramMap);
     } catch (FactoryFailureException e) {

@@ -17,7 +17,7 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
-  private BroadbandSource source;
+  private final BroadbandSource source;
 
   /**
    * BroadbandHandler constructor saves BroadbandSource

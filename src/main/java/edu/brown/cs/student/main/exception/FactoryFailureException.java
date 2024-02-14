@@ -11,6 +11,12 @@ public class FactoryFailureException extends Exception {
 
   final List<String> row;
 
+  /**
+   * Constructor for a DatasourceException, sets each of its fields
+   *
+   * @param message the String message for this exception
+   * @param row the row that caused the exception
+   */
   public FactoryFailureException(String message, List<String> row) {
     super(message);
     this.row = new ArrayList<>(row);

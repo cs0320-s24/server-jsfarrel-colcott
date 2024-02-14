@@ -12,28 +12,54 @@ import java.util.Map;
 public class DatasourceException extends Exception {
   // The root cause of this datasource problem
   private final Throwable cause;
-  private Map<String, Object> helperFields;
+  private final Map<String, Object> helperFields;
 
+  /**
+   * Constructor for a DatasourceException, sets each of its fields
+   *
+   * @param message the String message for this exception
+   * @param cause the exception that caused this exception to be thrown
+   * @param helperFields a map of fields to their values that may have caused the exception
+   */
   public DatasourceException(String message, Map<String, Object> helperFields, Throwable cause) {
     super(message); // Exception message
     this.helperFields = helperFields;
     this.cause = cause;
   }
 
+  /**
+   * Constructor for a DatasourceException, sets each of its fields
+   *
+   * @param message the String message for this exception
+   * @param helperFields a map of fields to their values that may have caused the exception
+   */
   public DatasourceException(String message, Map<String, Object> helperFields) {
     super(message); // Exception message
     this.helperFields = helperFields;
     this.cause = null;
   }
 
+  /**
+   * Constructor for a DatasourceException, sets each of its fields
+   *
+   * @param message the String message for this exception
+   */
   public DatasourceException(String message) {
     super(message); // Exception message
     this.cause = null;
+    this.helperFields = null;
   }
 
+  /**
+   * Constructor for a DatasourceException, sets each of its fields
+   *
+   * @param message the String message for this exception
+   * @param cause the exception that caused this exception to be thrown
+   */
   public DatasourceException(String message, Throwable cause) {
     super(message); // Exception message
     this.cause = cause;
+    this.helperFields = null;
   }
 
   /**
@@ -52,7 +78,7 @@ public class DatasourceException extends Exception {
    *
    * @return the fields to help user solve the issue
    */
-  public Map getHelperFields() {
+  public Map<String, Object> getHelperFields() {
     return this.helperFields;
   }
 }

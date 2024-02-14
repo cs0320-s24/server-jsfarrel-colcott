@@ -24,19 +24,19 @@ public class ACSBroadbandSource implements BroadbandSource {
   /** Map with keys = state names, values = state ids */
   private Map<String, String> states;
 
-  private Moshi moshi = new Moshi.Builder().build();
-  private Type listType = Types.newParameterizedType(List.class, List.class, String.class);
-  private JsonAdapter<List<List<String>>> listJsonAdapter = moshi.adapter(listType);
+  private final Moshi moshi = new Moshi.Builder().build();
+  private final Type listType = Types.newParameterizedType(List.class, List.class, String.class);
+  private final JsonAdapter<List<List<String>>> listJsonAdapter = moshi.adapter(listType);
 
   /**
-   * fetchStateIds is a helper function fetch state id and define state name to id map if undefined
+   * fetchStateId is a helper function fetch state id and define state name to id map if undefined
    *
    * @param state is String representation of state name
    * @return List of State
    * @throws Exception that may occur while fetching from census api, or an exception if state input
    *     is not valid
    */
-  private String fetchState(String state) throws Exception {
+  private String fetchStateId(String state) throws Exception {
     // create state map if undefined
     if (this.states == null) {
       // Endpoint for state ids:
@@ -69,11 +69,13 @@ public class ACSBroadbandSource implements BroadbandSource {
   }
 
   /**
-   * fetchCountyId is a helper function to get a county id from
+   * fetchCountyId is a helper function to get a county id from stateID and countyName
    *
    * @param stateId is the stateId of the which the county is in
    * @param countyName is the String of the county searching for
    * @return String representation of county id
+   * @throws Exception that may occur while fetching from census api, or an exception if county
+   *     input is not valid
    */
   private String fetchCountyId(String stateId, String countyName) throws Exception {
     URL requestURL =
@@ -82,7 +84,6 @@ public class ACSBroadbandSource implements BroadbandSource {
             "api.census.gov",
             "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + stateId);
     HttpURLConnection clientConnection = connect(requestURL);
-    ;
     List<List<String>> counties =
         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     List<String> validCounties = new ArrayList<>();
@@ -100,6 +101,16 @@ public class ACSBroadbandSource implements BroadbandSource {
     throw new DatasourceException("County input not valid", helperFields);
   }
 
+  /**
+   * fetchPercentBroadband is a helper function to get the percent broadband coverage for a specific
+   * county within a state
+   *
+   * @param stateId is the stateId of which the county is in
+   * @param countyId is the countyID of the county searching for
+   * @return double the percent broadband coverage
+   * @throws Exception that may occur while fetching from census api, or an exception if
+   *     state/county id input is not valid
+   */
   private double fetchPercentBroadband(String stateId, String countyId) throws Exception {
     URL requestURL =
         new URL(
@@ -126,12 +137,13 @@ public class ACSBroadbandSource implements BroadbandSource {
    * @param state is String representation of state we are looking for broadband coverage of
    * @param county is String representation of county we are looking for broadband coverage of
    * @return BroadbandData from ACS API for result
-   * @throws DatasourceException
+   * @throws DatasourceException that may occur while fetching from census api, or an exception if
+   *     state/county id input is not valid
    */
   @Override
   public BroadbandData getBroadBand(String state, String county) throws DatasourceException {
     try {
-      String stateId = fetchState(state);
+      String stateId = fetchStateId(state);
 
       String countyId = fetchCountyId(stateId, county);
 
@@ -146,8 +158,12 @@ public class ACSBroadbandSource implements BroadbandSource {
   }
 
   /**
-   * Private helper method; throws IOException so different callers can handle differently if
-   * needed.
+   * Private helper method for setting up an HttpURLConnection connection with the provided URL
+   *
+   * @return an HttpURLConnection with the provided URL
+   * @param requestURL the URL which we want to set up a connection to
+   * @throws DatasourceException if API connection doesn't result in success
+   * @throws IOException so different callers can handle differently if needed.
    */
   private static HttpURLConnection connect(URL requestURL) throws DatasourceException, IOException {
     URLConnection urlConnection = requestURL.openConnection();

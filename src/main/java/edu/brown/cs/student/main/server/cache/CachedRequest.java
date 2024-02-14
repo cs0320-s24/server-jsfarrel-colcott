@@ -9,8 +9,8 @@ import spark.Request;
  */
 public class CachedRequest extends Request {
 
-  private Request request;
-  private String paramsIdentifier;
+  private final Request request;
+  private final String paramsIdentifier;
 
   /**
    * Create CachedRequest
@@ -20,11 +20,11 @@ public class CachedRequest extends Request {
   public CachedRequest(Request request) {
     this.request = request;
 
-    String s = "";
+    StringBuilder s = new StringBuilder();
     for (String param : request.queryParams()) {
-      s += param + request.queryParams(param);
+      s.append(param).append(request.queryParams(param));
     }
-    this.paramsIdentifier = s;
+    this.paramsIdentifier = s.toString();
   }
 
   /**

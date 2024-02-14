@@ -9,7 +9,7 @@ import spark.Route;
 
 /** APICache is a wrapper class to an endpoint handler. */
 public class APICache implements Route {
-  private LoadingCache<CachedRequest, Object> requests;
+  private final LoadingCache<CachedRequest, Object> requests;
 
   /**
    * APICache constructor takes in Route and CacheBuilder. The cacheBuilder is built with load()
@@ -21,7 +21,7 @@ public class APICache implements Route {
   public APICache(Route route, CacheBuilder<Object, Object> cacheBuilder) {
     this.requests =
         cacheBuilder.build(
-            new CacheLoader<CachedRequest, Object>() {
+            new CacheLoader<>() {
               @Override
               public Object load(CachedRequest request) throws Exception {
                 return route.handle(request, null);

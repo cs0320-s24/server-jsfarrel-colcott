@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class CSVParser<T> implements Iterable<T> {
 
-  private Reader reader;
-  private CreatorFromRow<T> create;
+  private final Reader reader;
+  private final CreatorFromRow<T> create;
 
   private List<T> parsed;
   private List<T> public_parsed;
@@ -47,7 +47,7 @@ public class CSVParser<T> implements Iterable<T> {
   @NotNull
   @Override
   public Iterator<T> iterator() {
-    return new Iterator<T>() {
+    return new Iterator<>() {
 
       @Override
       public boolean hasNext() {
@@ -69,6 +69,12 @@ public class CSVParser<T> implements Iterable<T> {
     };
   }
 
+  /**
+   * getParsed simply returns the parsed rows as an unmodifiableList, also while making a copy of
+   * the parsed rows to be retrieved by callers
+   *
+   * @return the list of rows that was parsed from the file
+   */
   public List<T> getParsed() {
     if (this.public_parsed == null) {
       this.public_parsed = Collections.unmodifiableList(this.parsed);
@@ -77,14 +83,13 @@ public class CSVParser<T> implements Iterable<T> {
   }
 
   /**
-   * Parse the CSV, reading from reader, create rows, and return list of rows in CSV.
+   * Parse the CSV, reading from reader, create rows, and set parsed to the list of rows in CSV.
    *
-   * @return List of rows of type T
    * @throws IOException if failure reading CSV file
    * @throws FactoryFailureException if failure creating row
    * @throws IllegalArgumentException if invalid CSV file
    */
-  private List<T> parse() throws IOException, FactoryFailureException, IllegalArgumentException {
+  private void parse() throws IOException, FactoryFailureException, IllegalArgumentException {
     List<T> rows = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(reader);
 
@@ -93,14 +98,14 @@ public class CSVParser<T> implements Iterable<T> {
     // loop through lines until reaching line break or end of file (line is null)
     // source: https://ioflood.com/blog/java-read-line/
     while ((line = bufferedReader.readLine()) != null) {
-      if (line.length() > 0) {
+      if (!line.isEmpty()) {
         /* add '.' to line because regex has an issue missing. only for when the line length is
          * greater than 0 to avoid creating more issues (if length is 0 there can't be a comma too)
          */
         line += ".";
       }
       String[] values = rgx.split(line);
-      if (line.length() > 0) {
+      if (!line.isEmpty()) {
         // remove added '.'
         int cut = values.length - 1;
         values[cut] = values[cut].substring(0, values[cut].length() - 1);
@@ -115,6 +120,5 @@ public class CSVParser<T> implements Iterable<T> {
     }
 
     this.parsed = rows;
-    return rows;
   }
 }

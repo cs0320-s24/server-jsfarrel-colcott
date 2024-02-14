@@ -30,7 +30,7 @@ public class ResponseBuilder {
   public static String mapToJson(Map<String, Object> map) {
     Moshi moshi = new Moshi.Builder().build();
     Type mapStringObject = Types.newParameterizedType(Map.class, String.class, Object.class);
-    JsonAdapter adapter = moshi.adapter(mapStringObject);
+    JsonAdapter<Object> adapter = moshi.adapter(mapStringObject);
     return adapter.toJson(map);
   }
 

@@ -5,7 +5,7 @@ import edu.brown.cs.student.main.server.broadband.BroadbandSource;
 
 public class MockBroadbandSource implements BroadbandSource {
 
-  private double percentBroadband;
+  private final double percentBroadband;
 
   public MockBroadbandSource(double percentBroadband) {
     this.percentBroadband = percentBroadband;

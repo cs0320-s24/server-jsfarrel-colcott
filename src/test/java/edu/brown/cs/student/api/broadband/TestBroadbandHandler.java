@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-import edu.brown.cs.student.main.csv.ParserState;
 import edu.brown.cs.student.main.server.broadband.BroadbandHandler;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -36,7 +35,6 @@ public class TestBroadbandHandler {
   @BeforeEach
   public void setup() {
     // Re-initialize parser, state, etc. for every test method
-    ParserState parserState = new ParserState();
     Spark.get("/broadband", new BroadbandHandler(new MockBroadbandSource(50.0))); // no need to mock
     Spark.awaitInitialization(); // don't continue until the server is listening
 

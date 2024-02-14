@@ -1,7 +1,6 @@
 package edu.brown.cs.student.main.csv;
 
 import edu.brown.cs.student.main.exception.FactoryFailureException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,11 +15,11 @@ public class CSVSearcher {
     UNSPECIFIED
   }
 
-  private CSVParser parser;
-  private List<String[]> rows;
+  private final CSVParser parser;
+  private final List<String[]> rows;
   private String[] header;
   private int numCols;
-  private boolean hasHeader;
+  private final boolean hasHeader;
 
   /**
    * CSVSearcher constructor
@@ -34,13 +33,13 @@ public class CSVSearcher {
     this.rows = this.parser.getParsed();
 
     this.numCols = 0;
-    if (this.rows.size() > 0) {
+    if (!this.rows.isEmpty()) {
       this.numCols = this.rows.get(0).length;
     }
 
     this.header = new String[0];
     if (this.hasHeader) {
-      if (this.rows == null || this.rows.size() == 0) {
+      if (this.rows == null || this.rows.isEmpty()) {
         throw new IllegalArgumentException("Invalid CSV: header specified for empty CSV");
       }
       this.header = this.rows.get(0);
@@ -106,7 +105,7 @@ public class CSVSearcher {
         columnIndexes.add(i);
       }
     }
-    if (columnIndexes.size() > 0) {
+    if (!columnIndexes.isEmpty()) {
       return columnIndexes;
     }
 
@@ -126,7 +125,6 @@ public class CSVSearcher {
    * @param specification - boolean, true if column is specified, false if no specification
    * @return a list of rows (rows created as String[] objects) that have a datapoint equal to value
    *     in the specified column or any column if no specification.
-   * @throws IOException if failure to read CSV file
    * @throws FactoryFailureException if failure to create a row from raw CSV split data
    * @throws IllegalArgumentException if invalid CSV file or invalid specified column
    */
@@ -134,7 +132,7 @@ public class CSVSearcher {
       throws FactoryFailureException, IllegalArgumentException {
     List<String[]> result = new ArrayList<>();
 
-    if (this.rows.size() == 0) {
+    if (this.rows.isEmpty()) {
       return result;
     }
 

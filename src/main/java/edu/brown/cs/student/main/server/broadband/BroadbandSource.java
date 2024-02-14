@@ -13,5 +13,5 @@ public interface BroadbandSource {
    * @return BroadbandData, including the double percent coverage of broadband internet in county
    * @throws DatasourceException is any exception from getting the broadband data
    */
-  public BroadbandData getBroadBand(String state, String county) throws DatasourceException;
+  BroadbandData getBroadBand(String state, String county) throws DatasourceException;
 }

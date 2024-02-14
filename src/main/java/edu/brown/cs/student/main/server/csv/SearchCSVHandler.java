@@ -51,7 +51,9 @@ public class SearchCSVHandler implements Route {
     if (!headerParam.equals("false") && !headerParam.equals("true")) {
       return new StatusCode(400, "hasHeaders param must equal true or false.");
     }
-    if (headerParam.equals("false") && columnSpecifierString == "name") {
+    if (headerParam.equals("false")
+        && columnSpecifierString != null
+        && columnSpecifierString.equals("name")) {
       return new StatusCode(400, "hasHeaders must be true for columnSpecifier to be name.");
     }
     if (columnSpecifierString == null) {

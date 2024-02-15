@@ -15,7 +15,7 @@ public class ResponseBuilder {
    *
    * @return a moshi JsonAdapter
    */
-  public static JsonAdapter createAdapter() {
+  public static JsonAdapter<Map<String, Object>> createAdapter() {
     Moshi moshi = new Moshi.Builder().build();
     Type mapStringObject = Types.newParameterizedType(Map.class, String.class, Object.class);
     return moshi.adapter(mapStringObject);

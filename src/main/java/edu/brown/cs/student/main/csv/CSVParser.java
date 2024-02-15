@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NotNull;
 
-public class CSVParser<T> implements Iterable<T> {
+public class CSVParser<T> {
 
   private final Reader reader;
   private final CreatorFromRow<T> create;
@@ -19,12 +17,10 @@ public class CSVParser<T> implements Iterable<T> {
   private List<T> parsed;
   private List<T> public_parsed;
 
-  private int index = 0;
-
   // https://github.com/cs0320/class-livecode/
   // Path: main/old/F23/vignettes/csvRegex/src/test/java/TestRegex.java
   // regex string from cs0320 class livecode (old/F23/vignettes/csvRegex/src/test/java/TestRegex)
-  final Pattern rgx = Pattern.compile(",(?=([^\\\"]*\\\"[^\\\"]*\\\")*(?![^\\\"]*\\\"))");
+  final Pattern rgx = Pattern.compile(",(?=([^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 
   /**
    * CSVParser constructor
@@ -37,36 +33,6 @@ public class CSVParser<T> implements Iterable<T> {
     this.reader = newReader;
     this.create = newCreate;
     this.parse();
-  }
-
-  /**
-   * Override for iterator so one can iterate over rows after parsing
-   *
-   * @return Iterator object
-   */
-  @NotNull
-  @Override
-  public Iterator<T> iterator() {
-    return new Iterator<>() {
-
-      @Override
-      public boolean hasNext() {
-        boolean hN = parsed.size() > index;
-        if (!hN) {
-          index = 0;
-        }
-        return hN;
-      }
-
-      @Override
-      public T next() {
-        if (this.hasNext()) {
-          index = index + 1;
-          return parsed.get(index - 1);
-        }
-        return null;
-      }
-    };
   }
 
   /**
@@ -91,7 +57,7 @@ public class CSVParser<T> implements Iterable<T> {
    */
   private void parse() throws IOException, FactoryFailureException, IllegalArgumentException {
     List<T> rows = new ArrayList<>();
-    BufferedReader bufferedReader = new BufferedReader(reader);
+    BufferedReader bufferedReader = new BufferedReader(this.reader);
 
     String line;
     int numCols = -1;
@@ -104,7 +70,7 @@ public class CSVParser<T> implements Iterable<T> {
          */
         line += ".";
       }
-      String[] values = rgx.split(line);
+      String[] values = this.rgx.split(line);
       if (!line.isEmpty()) {
         // remove added '.'
         int cut = values.length - 1;

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
+import spark.utils.Assert;
 
 public class TestBroadbandHandler {
   @BeforeAll
@@ -86,18 +87,20 @@ public class TestBroadbandHandler {
     String county = "Kings";
     String params = "state=California&county=Kings";
 
-    HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
+    HttpURLConnection broadbandConnection = this.tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(broadbandConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      Assert.notNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(50.0, responseBody.get("percent"));
-    assertEquals(state, responseBody.get("state"));
-    assertEquals(county, responseBody.get("county"));
+      assertEquals(50.0, responseBody.get("percent"));
+      assertEquals(state, responseBody.get("state"));
+      assertEquals(county, responseBody.get("county"));
 
-    broadbandConnection.disconnect();
+      broadbandConnection.disconnect();
+    }
   }
 
   @Test
@@ -106,18 +109,20 @@ public class TestBroadbandHandler {
     String county = "Kings";
     String params = "state=" + state + "&county=" + county + "&extra=param";
 
-    HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
+    HttpURLConnection broadbandConnection = this.tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(broadbandConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      Assert.notNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(50.0, responseBody.get("percent"));
-    assertEquals(state, responseBody.get("state"));
-    assertEquals(county, responseBody.get("county"));
+      assertEquals(50.0, responseBody.get("percent"));
+      assertEquals(state, responseBody.get("state"));
+      assertEquals(county, responseBody.get("county"));
 
-    broadbandConnection.disconnect();
+      broadbandConnection.disconnect();
+    }
   }
 
   @Test
@@ -125,14 +130,16 @@ public class TestBroadbandHandler {
     String county = "Kings";
     String params = "county=" + county;
 
-    HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
+    HttpURLConnection broadbandConnection = this.tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(broadbandConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      Assert.notNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    broadbandConnection.disconnect();
+      broadbandConnection.disconnect();
+    }
   }
 
   @Test
@@ -140,36 +147,40 @@ public class TestBroadbandHandler {
     String state = "California";
     String params = "state=" + state;
 
-    HttpURLConnection broadbandConnection = tryRequest("broadband?" + params);
+    HttpURLConnection broadbandConnection = this.tryRequest("broadband?" + params);
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(broadbandConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      Assert.notNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    broadbandConnection.disconnect();
+      broadbandConnection.disconnect();
+    }
   }
 
   @Test
   public void testBroadbandFailureMissingBothParams() throws IOException {
-    HttpURLConnection broadbandConnection = tryRequest("broadband");
+    HttpURLConnection broadbandConnection = this.tryRequest("broadband");
     assertEquals(200, broadbandConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(broadbandConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(broadbandConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      Assert.notNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    broadbandConnection.disconnect();
+      broadbandConnection.disconnect();
+    }
   }
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
    *
-   * @param body
+   * @param body prints
    */
   private void showDetailsIfError(Map<String, Object> body) {
     if (body.containsKey("type") && "error".equals(body.get("type"))) {
-      System.out.println(body.toString());
+      System.out.println(body);
     }
   }
 }

@@ -14,24 +14,24 @@ import org.testng.Assert;
 public class ParseTests {
 
   /** Creator from row (List<String>) to String[] */
-  private CreatorFromRow<String[]> creator =
+  private final CreatorFromRow<String[]> creator =
       row -> {
         // src: https://stackoverflow.com/questions/2552420/converting-liststring-to-string-in-java
         return row.toArray(new String[0]);
       };
 
   /** Creator from row (List<String>) to String (concat row) */
-  private CreatorFromRow<String> creator2 =
+  private final CreatorFromRow<String> creator2 =
       row -> {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         for (String s : row) {
-          output += s;
+          output.append(s);
         }
-        return output;
+        return output.toString();
       };
 
   /** Creator from row (List<String>) to Integer (summing row) */
-  private CreatorFromRow<Integer> creator3 =
+  private final CreatorFromRow<Integer> creator3 =
       row -> {
         int output = 0;
         try {
@@ -72,7 +72,7 @@ public class ParseTests {
     expectedOutput.add(line1);
     expectedOutput.add(line2);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -87,7 +87,7 @@ public class ParseTests {
     String[] line = {"a", "B", "Hello", "1", "4"};
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -102,7 +102,7 @@ public class ParseTests {
     String[] line = {"a"};
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -125,7 +125,7 @@ public class ParseTests {
     expectedOutput.add(line4);
     expectedOutput.add(line5);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -138,11 +138,11 @@ public class ParseTests {
 
     List<String[]> expectedOutput = new ArrayList<>();
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
-  public void testParseInvalidBasic() throws IOException, FactoryFailureException {
+  public void testParseInvalidBasic() {
     String input = "a,b\na,b,c";
     StringReader reader = new StringReader(input);
 
@@ -151,7 +151,7 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseInvalidOneColumn() throws IOException, FactoryFailureException {
+  public void testParseInvalidOneColumn() {
     String input = "a\na\nb\na,c\ne\nf";
     StringReader reader = new StringReader(input);
 
@@ -160,7 +160,7 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseInvalidMultiColumn() throws IOException, FactoryFailureException {
+  public void testParseInvalidMultiColumn() {
     String input = "a\na,b,d,e,f\nb\na,c\ne\nf";
     StringReader reader = new StringReader(input);
 
@@ -169,7 +169,7 @@ public class ParseTests {
   }
 
   @Test
-  public void testParseInvalidComma() throws IOException, FactoryFailureException {
+  public void testParseInvalidComma() {
     String input = "a\na\nb\na,,\ne\nf";
     StringReader reader = new StringReader(input);
 
@@ -190,7 +190,7 @@ public class ParseTests {
 
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -206,7 +206,7 @@ public class ParseTests {
 
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -221,7 +221,7 @@ public class ParseTests {
     String[] line = {"Caesar", " Julius", " \"veni, vidi, vici\""};
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -236,7 +236,7 @@ public class ParseTests {
     String[] line = {"Caesar", " Julius", "", ""};
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -251,14 +251,20 @@ public class ParseTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"Caesar", " Julius", "", ""};
     expectedOutput.add(line);
+    expectedOutput.add(line);
+    expectedOutput.add(line);
+    expectedOutput.add(line);
+    expectedOutput.add(line);
+
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
-  public void testParseMalformedCSV() throws IOException, FactoryFailureException {
-    FileReader reader = new FileReader("data/malformed/malformed_signs.csv");
-
-    Assert.expectThrows(
-        IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
+  public void testParseMalformedCSV() throws IOException {
+    try (FileReader reader = new FileReader("data/malformed/malformed_signs.csv")) {
+      Assert.expectThrows(
+          IllegalArgumentException.class, () -> new CSVParser<>(reader, this.creator));
+    }
   }
 
   @Test
@@ -293,14 +299,14 @@ public class ParseTests {
     expectedOutput.add(line10);
     expectedOutput.add(line11);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
   public void testParseCreateToString() throws IOException, FactoryFailureException {
     String input = "Hello, World,!!!";
     StringReader reader = new StringReader(input);
-    CSVParser<String> parser = new CSVParser<>(reader, creator2);
+    CSVParser<String> parser = new CSVParser<>(reader, this.creator2);
 
     List<String> actualOutput = parser.getParsed();
 
@@ -308,14 +314,14 @@ public class ParseTests {
     String line = "Hello World!!!";
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
   public void testParseCreateToStringMultiLine() throws IOException, FactoryFailureException {
     String input = "Hello, World,!!!\nGood,bye, :)";
     StringReader reader = new StringReader(input);
-    CSVParser<String> parser = new CSVParser<>(reader, creator2);
+    CSVParser<String> parser = new CSVParser<>(reader, this.creator2);
 
     List<String> actualOutput = parser.getParsed();
 
@@ -325,14 +331,14 @@ public class ParseTests {
     expectedOutput.add(line1);
     expectedOutput.add(line2);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
   public void testParseCreateInt() throws IOException, FactoryFailureException {
     String input = "1,2,3,4\n1,0,0,-1";
     StringReader reader = new StringReader(input);
-    CSVParser<Integer> parser = new CSVParser<>(reader, creator3);
+    CSVParser<Integer> parser = new CSVParser<>(reader, this.creator3);
 
     List<Integer> actualOutput = parser.getParsed();
 
@@ -342,14 +348,15 @@ public class ParseTests {
     expectedOutput.add(line1);
     expectedOutput.add(line2);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
-  public void testParseCreateFactoryFail() throws IOException, FactoryFailureException {
+  public void testParseCreateFactoryFail() {
     String input = "1.0";
     StringReader reader = new StringReader(input);
 
-    Assert.expectThrows(FactoryFailureException.class, () -> new CSVParser<>(reader, creator3));
+    Assert.expectThrows(
+        FactoryFailureException.class, () -> new CSVParser<>(reader, this.creator3));
   }
 }

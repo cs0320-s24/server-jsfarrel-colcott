@@ -26,7 +26,7 @@ public class ACSBroadbandSource implements BroadbandSource {
 
   private final Moshi moshi = new Moshi.Builder().build();
   private final Type listType = Types.newParameterizedType(List.class, List.class, String.class);
-  private final JsonAdapter<List<List<String>>> listJsonAdapter = moshi.adapter(listType);
+  private final JsonAdapter<List<List<String>>> listJsonAdapter = this.moshi.adapter(this.listType);
 
   /**
    * fetchStateId is a helper function fetch state id and define state name to id map if undefined
@@ -44,17 +44,23 @@ public class ACSBroadbandSource implements BroadbandSource {
       URL requestURL =
           new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=state:*");
       HttpURLConnection clientConnection = connect(requestURL);
-      List<List<String>> states =
+      List<List<String>> statesFromJson =
           this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
       Map<String, String> statesMap = new HashMap<>();
-      for (List<String> stateStateId : states) {
-        // skips header
-        if (!stateStateId.get(0).equals("NAME")) {
-          statesMap.put(stateStateId.get(0), stateStateId.get(1));
+      if (statesFromJson != null) {
+        for (List<String> stateStateId : statesFromJson) {
+          // skips header
+          if (!stateStateId.get(0).equals("NAME")) {
+            statesMap.put(stateStateId.get(0), stateStateId.get(1));
+          }
         }
-      }
 
-      this.states = statesMap;
+        this.states = statesMap;
+      }
+    }
+
+    if (this.states == null) {
+      throw new DatasourceException("There was an issue fetching states. Please re-query.");
     }
 
     String stateId = this.states.get(state);
@@ -84,20 +90,23 @@ public class ACSBroadbandSource implements BroadbandSource {
             "api.census.gov",
             "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + stateId);
     HttpURLConnection clientConnection = connect(requestURL);
-    List<List<String>> counties =
+    List<List<String>> countiesFromJson =
         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     List<String> validCounties = new ArrayList<>();
-    for (List<String> countyCountyId : counties) {
-      if (!countyCountyId.get(0).equals("NAME")) {
-        validCounties.add(countyCountyId.get(0));
-        if (countyCountyId.get(0).startsWith(countyName + " County, ")) {
-          return countyCountyId.get(2);
+    if (countiesFromJson != null) {
+      for (List<String> countyCountyId : countiesFromJson) {
+        if (!countyCountyId.get(0).equals("NAME")) {
+          validCounties.add(countyCountyId.get(0));
+          if (countyCountyId.get(0).startsWith(countyName + " County, ")) {
+            return countyCountyId.get(2);
+          }
         }
       }
     }
 
     Map<String, Object> helperFields = new HashMap<>();
     helperFields.put("valid-counties", validCounties);
+
     throw new DatasourceException("County input not valid", helperFields);
   }
 
@@ -124,11 +133,15 @@ public class ACSBroadbandSource implements BroadbandSource {
 
     List<List<String>> broadBandResponse =
         this.listJsonAdapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-    String broadbandHouseholds = broadBandResponse.get(1).get(1);
-    String totalHouseholds = broadBandResponse.get(1).get(2);
+    if (broadBandResponse != null && !broadBandResponse.isEmpty()) {
+      List<String> broadBandResponseRow = broadBandResponse.get(1);
+      String broadbandHouseholds = broadBandResponseRow.get(1);
+      String totalHouseholds = broadBandResponseRow.get(2);
+      // todo: is there better source for this
+      return 100.0 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
+    }
 
-    // todo: is there better source for this
-    return 100.0 * Integer.parseInt(broadbandHouseholds) / Integer.parseInt(totalHouseholds);
+    throw new DatasourceException("Failed to fetch broadband coverage data.");
   }
 
   /**
@@ -143,11 +156,11 @@ public class ACSBroadbandSource implements BroadbandSource {
   @Override
   public BroadbandData getBroadBand(String state, String county) throws DatasourceException {
     try {
-      String stateId = fetchStateId(state);
+      String stateId = this.fetchStateId(state);
 
-      String countyId = fetchCountyId(stateId, county);
+      String countyId = this.fetchCountyId(stateId, county);
 
-      double percentBroadband = fetchPercentBroadband(stateId, countyId);
+      double percentBroadband = this.fetchPercentBroadband(stateId, countyId);
 
       return new BroadbandData(percentBroadband);
     } catch (DatasourceException e) {
@@ -167,9 +180,8 @@ public class ACSBroadbandSource implements BroadbandSource {
    */
   private static HttpURLConnection connect(URL requestURL) throws DatasourceException, IOException {
     URLConnection urlConnection = requestURL.openConnection();
-    if (!(urlConnection instanceof HttpURLConnection))
+    if (!(urlConnection instanceof HttpURLConnection clientConnection))
       throw new DatasourceException("unexpected: result of connection wasn't HTTP");
-    HttpURLConnection clientConnection = (HttpURLConnection) urlConnection;
     clientConnection.connect(); // GET
     if (clientConnection.getResponseCode() != 200)
       throw new DatasourceException(

@@ -1,6 +1,7 @@
 package edu.brown.cs.student.api.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -104,7 +105,7 @@ public class TestSearchCSVHandler {
   public void testSearchCSVSuccess() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "3";
@@ -120,26 +121,28 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("data"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      assertEquals(result, responseBody.get("data"));
 
-    loadConnection.disconnect();
-    searchConnection.disconnect();
+      loadConnection.disconnect();
+      searchConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchCSVDupe() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "3";
@@ -155,36 +158,43 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("data"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      assertEquals(result, responseBody.get("data"));
 
-    searchConnection.disconnect();
+      searchConnection.disconnect();
+    }
 
-    searchConnection = tryRequest("searchcsv?" + params);
+    searchConnection = this.tryRequest("searchcsv?" + params);
 
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(result, responseBody.get("data"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      assertEquals(result, responseBody.get("data"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchCSVLoadNewCSV() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "3";
@@ -200,35 +210,41 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    assertEquals(result, responseBody.get("data"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      assertEquals(result, responseBody.get("data"));
 
-    loadConnection.disconnect();
-    searchConnection.disconnect();
+      loadConnection.disconnect();
+      searchConnection.disconnect();
 
-    filepath = "data/stars/ten-star.csv";
-    // request loadcsv
-    loadConnection = tryRequest("loadcsv?filepath=" + filepath);
-    assertEquals(200, loadConnection.getResponseCode());
+      filepath = "data/stars/ten-star.csv";
+      // request loadcsv
+      loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
+      assertEquals(200, loadConnection.getResponseCode());
+    }
 
-    searchConnection = tryRequest("searchcsv?" + params);
+    searchConnection = this.tryRequest("searchcsv?" + params);
 
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      assertEquals(result, responseBody.get("data"));
 
-    assertEquals(result, responseBody.get("data"));
-
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
@@ -246,22 +262,24 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_json", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_json", responseBody.get("result"));
 
-    searchConnection.disconnect();
+      searchConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchWithSpace() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "Proxima%20Centauri";
@@ -277,16 +295,18 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("70667", "Proxima Centauri", "-0.47175", "-0.36132", "-1.15037"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("70667", "Proxima Centauri", "-0.47175", "-0.36132", "-1.15037"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
+    }
 
     searchConnection.disconnect();
     loadConnection.disconnect();
@@ -296,7 +316,7 @@ public class TestSearchCSVHandler {
   public void testSearchMultipleResults() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "";
@@ -312,29 +332,31 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("1", "", "282.43485", "0.00449", "5.36884"));
-    result.add(Arrays.asList("2", "", "43.04329", "0.00285", "-15.24144"));
-    result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("1", "", "282.43485", "0.00449", "5.36884"));
+      result.add(Arrays.asList("2", "", "43.04329", "0.00285", "-15.24144"));
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchByIndex() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -350,51 +372,55 @@ public class TestSearchCSVHandler {
             + columnIdentifier
             + "&hasHeaders="
             + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchNoColumnSpecification() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
     String hasHeaders = "true";
     String params = "toSearch=" + toSearch + "&hasHeaders=" + hasHeaders;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchNoColumnSpecificationAsNone() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -407,26 +433,28 @@ public class TestSearchCSVHandler {
             + hasHeaders
             + "&columnSpecifier="
             + columnSpecifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchNoColumnHeader() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -442,26 +470,28 @@ public class TestSearchCSVHandler {
             + columnSpecifier
             + "&columnIdentifier="
             + columnIdentifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchBigIndexNoHeader() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -477,24 +507,25 @@ public class TestSearchCSVHandler {
             + columnSpecifier
             + "&columnIdentifier="
             + columnIdentifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchColumnSpecifierNoIdentifier() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -507,23 +538,25 @@ public class TestSearchCSVHandler {
             + hasHeaders
             + "&columnSpecifier="
             + columnSpecifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchColumnIdentifierNoSpecifier() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -536,68 +569,74 @@ public class TestSearchCSVHandler {
             + hasHeaders
             + "&columnIdentifier="
             + columnIdentifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchColumnNoHasHeaders() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
     String params = "toSearch=" + toSearch;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchColumnNoColumnSpecification() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
     String params = "toSearch=" + toSearch + "&hasHeaders=" + "true";
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    assertEquals("success", responseBody.get("result"));
-    assertEquals(result, responseBody.get("data"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      assertEquals("success", responseBody.get("result"));
+      assertEquals(result, responseBody.get("data"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchColumnNotFound() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "0";
@@ -613,23 +652,25 @@ public class TestSearchCSVHandler {
             + columnSpecifier
             + "&columnIdentifier="
             + columnIdentifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testSearchRhodeIslandIncome() throws IOException {
     String filepath = "data/rhode_island_income.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
     String toSearch = "Barrington";
@@ -645,31 +686,33 @@ public class TestSearchCSVHandler {
             + columnSpecifier
             + "&columnIdentifier="
             + columnIdentifier;
-    HttpURLConnection searchConnection = tryRequest("searchcsv?" + params);
+    HttpURLConnection searchConnection = this.tryRequest("searchcsv?" + params);
     assertEquals(200, searchConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(searchConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(searchConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("Barrington", "\"130,455.00\"", "\"154,441.00\"", "\"69,917.00\""));
-    assertEquals(result, responseBody.get("data"));
-    assertEquals("success", responseBody.get("result"));
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("Barrington", "\"130,455.00\"", "\"154,441.00\"", "\"69,917.00\""));
+      assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
 
-    searchConnection.disconnect();
-    loadConnection.disconnect();
+      searchConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
    *
-   * @param body
+   * @param body prints
    */
   private void showDetailsIfError(Map<String, Object> body) {
     if (body.containsKey("type") && "error".equals(body.get("type"))) {
-      System.out.println(body.toString());
+      System.out.println(body);
     }
   }
 }

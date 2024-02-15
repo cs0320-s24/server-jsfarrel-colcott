@@ -24,6 +24,9 @@ Endpoint design choices:
   - All parameters must be defined, or an error will be returned (county and state).
   - A timestamp (in form `SimpleDateFormat`) from EST time zone is included with response
   - State and county is included in response.
+  - We chose to use `S2801_C01_014E`, an estimate of total households with broadband internet of any kind, 
+    and `S2801_C01_001E`, an estimate of total households to create a percent coverage. We believe this
+    gives the best estimate of coverage, but would differ stakeholder to stakeholder. (`100*S2801_C01_014E/S2801_C01_001E`)
 - `GET /loadcsv`
     - The handler takes in a `ParserState`, a class to manage a `CSVParser` among all endpoints to ensure
       there is only one existing parser for all endpoints. `ParserState` simply contains a `CSVParser` and

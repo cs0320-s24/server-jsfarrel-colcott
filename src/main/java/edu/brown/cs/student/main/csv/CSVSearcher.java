@@ -15,7 +15,6 @@ public class CSVSearcher {
     UNSPECIFIED
   }
 
-  private final CSVParser parser;
   private final List<String[]> rows;
   private String[] header;
   private int numCols;
@@ -28,9 +27,8 @@ public class CSVSearcher {
    * @param hasHeader - boolean for if the CSV has a header or not.
    */
   public CSVSearcher(CSVParser<String[]> newParser, boolean hasHeader) {
-    this.parser = newParser;
     this.hasHeader = hasHeader;
-    this.rows = this.parser.getParsed();
+    this.rows = newParser.getParsed();
 
     this.numCols = 0;
     if (!this.rows.isEmpty()) {
@@ -39,7 +37,7 @@ public class CSVSearcher {
 
     this.header = new String[0];
     if (this.hasHeader) {
-      if (this.rows == null || this.rows.isEmpty()) {
+      if (this.rows.isEmpty()) {
         throw new IllegalArgumentException("Invalid CSV: header specified for empty CSV");
       }
       this.header = this.rows.get(0);
@@ -85,7 +83,7 @@ public class CSVSearcher {
     List<Integer> columnIndexes = new ArrayList<>();
 
     // check if column specified is an index (integer)
-    if (specification == ColumnSpecified.INDEX && isInteger(column)) {
+    if (specification == ColumnSpecified.INDEX && this.isInteger(column)) {
       int x = Integer.parseInt(column);
       if (x >= 0 && x < this.numCols) {
         columnIndexes.add(x);
@@ -98,7 +96,7 @@ public class CSVSearcher {
       throw new IllegalArgumentException("Header length and column count must match.");
     }
 
-    for (int i = 0; i < numCols; i++) {
+    for (int i = 0; i < this.numCols; i++) {
       // if didn't specify column, add all indexes
       if (specification == ColumnSpecified.UNSPECIFIED
           || (this.header.length == this.numCols && this.header[i].equals(column))) {
@@ -136,7 +134,7 @@ public class CSVSearcher {
       return result;
     }
 
-    List<Integer> checkColumns = getColumns(column, specification);
+    List<Integer> checkColumns = this.getColumns(column, specification);
     // loop through rows and columns to check and add row if there is a matching value
     // i; i < this.rows.size(); i++
     int i;

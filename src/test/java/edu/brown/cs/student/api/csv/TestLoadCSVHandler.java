@@ -1,6 +1,7 @@
 package edu.brown.cs.student.api.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -98,206 +99,237 @@ public class TestLoadCSVHandler {
   public void testLoadDataSuccess() throws IOException {
     String filepath = "data/stars/stardata.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(filepath, responseBody.get("filepath"));
+      assertEquals(filepath, responseBody.get("filepath"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadMultipleCSVs() throws IOException {
     String filepath = "data/stars/stardata.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(filepath, responseBody.get("filepath"));
+      assertEquals(filepath, responseBody.get("filepath"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
 
     filepath = "data/census/postsecondary_education.csv";
-    loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(filepath, responseBody.get("filepath"));
+      assertEquals(filepath, responseBody.get("filepath"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadDataNonExistentCSV() throws IOException {
     String filepath = "data/stars/nonexistantcsv.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadDataNonCSVFile() throws IOException {
     String filepath = "data/menu.json";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadDataMalformedCSV() throws IOException {
     String filepath = "data/malformed/malformed_signs.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadCSVOutsideDirectory() throws IOException {
     String filepath = "data/../../test.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
 
     filepath = "../test.csv";
-    loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
-
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
 
     filepath = "..";
-    loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadDataNoParamsRequest() throws IOException {
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv");
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv");
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadDataEmptyParam() throws IOException {
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=");
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=");
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadNonExistentParam() throws IOException {
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filpath=data/abc.csv");
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filpath=data/abc.csv");
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_bad_request", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_bad_request", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadExtraParam() throws IOException {
     String filepath = "data/census/income_by_race.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath + "&hello=hi");
+    HttpURLConnection loadConnection =
+        this.tryRequest("loadcsv?filepath=" + filepath + "&hello=hi");
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testLoadRhodeIslandIncome() throws IOException {
     String filepath = "data/rhode_island_income.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("success", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("success", responseBody.get("result"));
 
-    assertEquals(filepath, responseBody.get("filepath"));
+      assertEquals(filepath, responseBody.get("filepath"));
 
-    loadConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
    *
-   * @param body
+   * @param body prints
    */
   private void showDetailsIfError(Map<String, Object> body) {
     if (body.containsKey("type") && "error".equals(body.get("type"))) {
-      System.out.println(body.toString());
+      System.out.println(body);
     }
   }
 }

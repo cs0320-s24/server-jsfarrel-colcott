@@ -94,16 +94,21 @@ public class TestViewCSVHandler {
   public void testViewDataSuccess() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-
-    HttpURLConnection viewConnection = tryRequest("viewcsv");
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+    }
+    HttpURLConnection viewConnection = this.tryRequest("viewcsv");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
-    showDetailsIfError(responseBody);
+    Map<String, Object> responseBody;
+    try (Buffer b = new Buffer().readFrom(viewConnection.getInputStream())) {
+      responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+    }
 
     List<List<String>> result = new ArrayList<>();
     result.add(Arrays.asList("StarID", "ProperName", "X", "Y", "Z"));
@@ -129,104 +134,119 @@ public class TestViewCSVHandler {
   public void testViewExtraParam() throws IOException {
     String filepath = "data/stars/ten-star.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath + "&hello=hi");
+    HttpURLConnection loadConnection =
+        this.tryRequest("loadcsv?filepath=" + filepath + "&hello=hi");
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    HttpURLConnection viewConnection = tryRequest("viewcsv?hello=hi");
+    HttpURLConnection viewConnection = this.tryRequest("viewcsv?hello=hi");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    List<List<String>> result = new ArrayList<>();
-    result.add(Arrays.asList("StarID", "ProperName", "X", "Y", "Z"));
-    result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
-    result.add(Arrays.asList("1", "", "282.43485", "0.00449", "5.36884"));
-    result.add(Arrays.asList("2", "", "43.04329", "0.00285", "-15.24144"));
-    result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
-    result.add(Arrays.asList("3759", "96 G. Psc", "7.26388", "1.55643", "0.68697"));
-    result.add(Arrays.asList("70667", "Proxima Centauri", "-0.47175", "-0.36132", "-1.15037"));
-    result.add(Arrays.asList("71454", "Rigel Kentaurus B", "-0.50359", "-0.42128", "-1.1767"));
-    result.add(Arrays.asList("71457", "Rigel Kentaurus A", "-0.50362", "-0.42139", "-1.17665"));
-    result.add(Arrays.asList("87666", "Barnard's Star", "-0.01729", "-1.81533", "0.14824"));
-    result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
+    try (Buffer b = new Buffer().readFrom(viewConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      List<List<String>> result = new ArrayList<>();
+      result.add(Arrays.asList("StarID", "ProperName", "X", "Y", "Z"));
+      result.add(Arrays.asList("0", "Sol", "0", "0", "0"));
+      result.add(Arrays.asList("1", "", "282.43485", "0.00449", "5.36884"));
+      result.add(Arrays.asList("2", "", "43.04329", "0.00285", "-15.24144"));
+      result.add(Arrays.asList("3", "", "277.11358", "0.02422", "223.27753"));
+      result.add(Arrays.asList("3759", "96 G. Psc", "7.26388", "1.55643", "0.68697"));
+      result.add(Arrays.asList("70667", "Proxima Centauri", "-0.47175", "-0.36132", "-1.15037"));
+      result.add(Arrays.asList("71454", "Rigel Kentaurus B", "-0.50359", "-0.42128", "-1.1767"));
+      result.add(Arrays.asList("71457", "Rigel Kentaurus A", "-0.50362", "-0.42139", "-1.17665"));
+      result.add(Arrays.asList("87666", "Barnard's Star", "-0.01729", "-1.81533", "0.14824"));
+      result.add(Arrays.asList("118721", "", "-2.28262", "0.64697", "0.29354"));
 
-    assertEquals("success", responseBody.get("result"));
-    assertEquals(result, responseBody.get("data"));
+      assertEquals("success", responseBody.get("result"));
+      assertEquals(result, responseBody.get("data"));
 
-    loadConnection.disconnect();
-    viewConnection.disconnect();
+      loadConnection.disconnect();
+      viewConnection.disconnect();
+    }
   }
 
   @Test
   public void testViewWithoutLoading() throws IOException {
-    HttpURLConnection viewConnection = tryRequest("viewcsv?hello=hi");
+    HttpURLConnection viewConnection = this.tryRequest("viewcsv?hello=hi");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
-    showDetailsIfError(responseBody);
+    try (Buffer b = new Buffer().readFrom(viewConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
 
-    assertEquals("error_bad_json", responseBody.get("result"));
+      assertEquals("error_bad_json", responseBody.get("result"));
 
-    viewConnection.disconnect();
+      viewConnection.disconnect();
+    }
   }
 
   @Test
   public void testViewAfterFailureLoading() throws IOException {
     String filepath = "data/malformed/malformed_signs.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
     assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
 
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
-    assertEquals("error_datasource", responseBody.get("result"));
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+      assertEquals("error_datasource", responseBody.get("result"));
+    }
 
-    HttpURLConnection viewConnection = tryRequest("viewcsv?hello=hi");
+    HttpURLConnection viewConnection = this.tryRequest("viewcsv?hello=hi");
     assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
+    try (Buffer b = new Buffer().readFrom(viewConnection.getInputStream())) {
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
 
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
-    showDetailsIfError(responseBody);
+      assertEquals("error_bad_json", responseBody.get("result"));
 
-    assertEquals("error_bad_json", responseBody.get("result"));
-
-    viewConnection.disconnect();
-    loadConnection.disconnect();
+      viewConnection.disconnect();
+      loadConnection.disconnect();
+    }
   }
 
   @Test
   public void testViewRhodeIslandIncome() throws IOException {
     String filepath = "data/rhode_island_income.csv";
     // request loadcsv
-    HttpURLConnection loadConnection = tryRequest("loadcsv?filepath=" + filepath);
-    assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
-    Map<String, Object> responseBody =
-        this.adapter.fromJson(new Buffer().readFrom(loadConnection.getInputStream()));
-    showDetailsIfError(responseBody);
+    HttpURLConnection loadConnection = this.tryRequest("loadcsv?filepath=" + filepath);
+    try (Buffer b = new Buffer().readFrom(loadConnection.getInputStream())) {
+      assertEquals(200, loadConnection.getResponseCode()); // successful *connection*
+      Map<String, Object> responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
+    }
 
-    HttpURLConnection viewConnection = tryRequest("viewcsv");
-    assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
-    responseBody = this.adapter.fromJson(new Buffer().readFrom(viewConnection.getInputStream()));
-    showDetailsIfError(responseBody);
+    Map<String, Object> responseBody;
+    HttpURLConnection viewConnection = this.tryRequest("viewcsv");
+    try (Buffer b = new Buffer().readFrom(viewConnection.getInputStream())) {
+      assertEquals(200, viewConnection.getResponseCode()); // successful *connection*
+      responseBody = this.adapter.fromJson(b);
+      assertNotNull(responseBody);
+      this.showDetailsIfError(responseBody);
 
-    assertEquals("success", responseBody.get("result"));
-    assertNotNull(responseBody.get("data"));
-    assertEquals(ArrayList.class, responseBody.get("data").getClass());
+      assertEquals("success", responseBody.get("result"));
+      assertNotNull(responseBody.get("data"));
+      assertEquals(ArrayList.class, responseBody.get("data").getClass());
 
-    loadConnection.disconnect();
-    viewConnection.disconnect();
+      loadConnection.disconnect();
+      viewConnection.disconnect();
+    }
   }
 
   /**
    * Helper to make working with a large test suite easier: if an error, print more info.
    *
-   * @param body
+   * @param body is printed
    */
   private void showDetailsIfError(Map<String, Object> body) {
     if (body.containsKey("type") && "error".equals(body.get("type"))) {
-      System.out.println(body.toString());
+      System.out.println(body);
     }
   }
 }

@@ -16,7 +16,7 @@ import org.testng.Assert;
 public class SearchTests {
 
   /** Creator from row (List<String>) to String[] */
-  private CreatorFromRow<String[]> creator =
+  private final CreatorFromRow<String[]> creator =
       row -> {
         // src: https://stackoverflow.com/questions/2552420/converting-liststring-to-string-in-java
         return row.toArray(new String[0]);
@@ -49,7 +49,7 @@ public class SearchTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"1", "Andreas", "282.43485", "0.00449", "5.36884"};
     expectedOutput.add(line);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -66,7 +66,7 @@ public class SearchTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"1", "Andreas", "282.43485", "0.00449", "5.36884"};
     expectedOutput.add(line);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -83,19 +83,19 @@ public class SearchTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"1", "Andreas", "282.43485", "0.00449", "5.36884"};
     expectedOutput.add(line);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
 
     actualOutput = searcher.search("Rory", column, ColumnSpecified.UNSPECIFIED);
     expectedOutput = new ArrayList<>();
     String[] line2 = {"2", "Rory", "43.04329", "0.00285", "-15.24144"};
     expectedOutput.add(line2);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
 
     actualOutput = searcher.search("0", "StarID", ColumnSpecified.NAME);
     expectedOutput = new ArrayList<>();
     String[] line0 = {"0", "Sol", "0", "0", "0"};
     expectedOutput.add(line0);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -112,7 +112,7 @@ public class SearchTests {
     List<String[]> expectedOutput = new ArrayList<>();
     String[] line = {"1", "Andreas", "282.43485", "0.00449", "5.36884"};
     expectedOutput.add(line);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -144,7 +144,7 @@ public class SearchTests {
     expectedOutput.add(line4);
     expectedOutput.add(line5);
     expectedOutput.add(line6);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -176,7 +176,7 @@ public class SearchTests {
     expectedOutput.add(line4);
     expectedOutput.add(line5);
     expectedOutput.add(line6);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -208,7 +208,7 @@ public class SearchTests {
     expectedOutput.add(line4);
     expectedOutput.add(line5);
     expectedOutput.add(line6);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -232,7 +232,7 @@ public class SearchTests {
     expectedOutput.add(line2);
     expectedOutput.add(line3);
     expectedOutput.add(line4);
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -248,7 +248,7 @@ public class SearchTests {
     List<String[]> actualOutput = searcher.search(value, column, ColumnSpecified.UNSPECIFIED);
     List<String[]> expectedOutput = new ArrayList<>();
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -268,18 +268,16 @@ public class SearchTests {
     expectedOutput.add(line1);
     expectedOutput.add(line2);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
-  public void testSearchMalformedData() throws IOException, FactoryFailureException {
+  public void testSearchMalformedData() throws IOException {
     String filename = "malformed/malformed_signs.csv";
-    String value = "hi";
-    String column = "";
-    FileReader fileReader = new FileReader("data/" + filename);
-
-    Assert.expectThrows(
-        IllegalArgumentException.class, () -> new CSVParser<>(fileReader, this.creator));
+    try (FileReader fileReader = new FileReader("data/" + filename)) {
+      Assert.expectThrows(
+          IllegalArgumentException.class, () -> new CSVParser<>(fileReader, this.creator));
+    }
   }
 
   @Test
@@ -295,7 +293,7 @@ public class SearchTests {
     List<String[]> actualOutput = searcher.search(value, column, ColumnSpecified.UNSPECIFIED);
     List<String[]> expectedOutput = new ArrayList<>();
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -313,14 +311,12 @@ public class SearchTests {
     String[] line = {"", ""};
     expectedOutput.add(line);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
-  public void testSearchBadParserFailure() throws IOException, FactoryFailureException {
+  public void testSearchBadParserFailure() {
     String data = ",a,b,\n,";
-    String value = "";
-    String column = "";
     StringReader stringReader = new StringReader(data);
     Assert.expectThrows(
         IllegalArgumentException.class, () -> new CSVParser<>(stringReader, this.creator));
@@ -339,7 +335,7 @@ public class SearchTests {
     List<String[]> actualOutput = searcher.search(value, column, ColumnSpecified.NAME);
     List<String[]> expectedOutput = new ArrayList<>();
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 
   @Test
@@ -373,6 +369,6 @@ public class SearchTests {
     expectedOutput.add(line1);
     expectedOutput.add(line2);
 
-    assertEqualsCSV(actualOutput, expectedOutput);
+    this.assertEqualsCSV(actualOutput, expectedOutput);
   }
 }

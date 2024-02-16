@@ -154,7 +154,7 @@ public class TestBroadbandHandler {
   }
 
   @Test
-  public void testBroadbandExtraParam() throws IOException, InterruptedException {
+  public void testBroadbandExtraParamCaching() throws IOException, InterruptedException {
     String state = "California";
     String county = "Kings";
     String params = "state=" + state + "&county=" + county + "&extra=param";
@@ -197,7 +197,7 @@ public class TestBroadbandHandler {
   }
 
   @Test
-  public void testBroadbandExtraParamCaching() throws IOException {
+  public void testBroadbandExtraParam() throws IOException {
     String state = "California";
     String county = "Kings";
     String params = "state=" + state + "&county=" + county + "&extra=param";
@@ -272,7 +272,7 @@ public class TestBroadbandHandler {
    * @param body prints
    */
   private void showDetailsIfError(Map<String, Object> body) {
-    if (body.containsKey("type") && "error".equals(body.get("type"))) {
+    if (body.containsKey("result") && "error".equals(body.get("result"))) {
       System.out.println(body);
     }
   }

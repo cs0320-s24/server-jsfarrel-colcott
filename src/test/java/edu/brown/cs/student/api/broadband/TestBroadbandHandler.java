@@ -40,7 +40,7 @@ public class TestBroadbandHandler {
   @BeforeEach
   public void setup() {
     CacheBuilder<Object, Object> cacheBuilder =
-        CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS);
+        CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS);
     // Re-initialize parser, state, etc. for every test method
     Spark.get(
         "/broadband",
@@ -113,6 +113,56 @@ public class TestBroadbandHandler {
   }
 
   @Test
+  public void testBroadbandFailureBetweenCache() throws IOException, InterruptedException {
+    String params = "state=California&county=Kings";
+
+    HttpURLConnection broadbandConnection1 = this.tryRequest("broadband?" + params);
+    assertEquals(200, broadbandConnection1.getResponseCode()); // successful *connection*
+    try (Buffer b1 = new Buffer().readFrom(broadbandConnection1.getInputStream())) {
+      Map<String, Object> responseBody1 = this.adapter.fromJson(b1);
+      Assert.notNull(responseBody1);
+      this.showDetailsIfError(responseBody1);
+      assertEquals("success", responseBody1.get("result"));
+
+      Thread.sleep(1000);
+      HttpURLConnection broadbandConnection2 = this.tryRequest("broadband?" + params);
+      assertEquals(200, broadbandConnection2.getResponseCode()); // successful *connection*
+      Buffer b2 = new Buffer().readFrom(broadbandConnection2.getInputStream());
+      Map<String, Object> responseBody2 = this.adapter.fromJson(b2);
+      Assert.notNull(responseBody2);
+      this.showDetailsIfError(responseBody2);
+      assertEquals("success", responseBody2.get("result"));
+      assertEquals(responseBody1.get("date"), responseBody2.get("date")); // same date/time
+
+      String difParams = "state=New%20Yrke";
+      HttpURLConnection broadbandConnection3 = this.tryRequest("broadband?" + difParams);
+      assertEquals(200, broadbandConnection3.getResponseCode()); // successful *connection*
+      Buffer b3 = new Buffer().readFrom(broadbandConnection3.getInputStream());
+      Map<String, Object> responseBody3 = this.adapter.fromJson(b3);
+      Assert.notNull(responseBody3);
+      this.showDetailsIfError(responseBody3);
+      assertEquals("error_bad_request", responseBody3.get("result"));
+
+      Thread.sleep(6000);
+      HttpURLConnection broadbandConnection4 = this.tryRequest("broadband?" + params);
+      assertEquals(200, broadbandConnection4.getResponseCode()); // successful *connection*
+      Buffer b4 = new Buffer().readFrom(broadbandConnection4.getInputStream());
+      Map<String, Object> responseBody4 = this.adapter.fromJson(b4);
+      Assert.notNull(responseBody4);
+      this.showDetailsIfError(responseBody4);
+      assertEquals("success", responseBody4.get("result"));
+
+      assertNotEquals(responseBody1.get("date"), responseBody4.get("date")); // different date/time
+      assertNotEquals(responseBody2.get("date"), responseBody4.get("date")); // different date/time
+      assertNotEquals(responseBody3.get("date"), responseBody4.get("date")); // different date/time
+
+      broadbandConnection1.disconnect();
+      broadbandConnection2.disconnect();
+      broadbandConnection3.disconnect();
+    }
+  }
+
+  @Test
   public void testBroadbandSuccessCaching() throws IOException, InterruptedException {
     String params = "state=California&county=Kings";
 
@@ -124,7 +174,7 @@ public class TestBroadbandHandler {
       this.showDetailsIfError(responseBody1);
       assertEquals("success", responseBody1.get("result"));
 
-      Thread.sleep(5000);
+      Thread.sleep(1000);
       HttpURLConnection broadbandConnection2 = this.tryRequest("broadband?" + params);
       assertEquals(200, broadbandConnection2.getResponseCode()); // successful *connection*
       Buffer b2 = new Buffer().readFrom(broadbandConnection2.getInputStream());
@@ -135,17 +185,30 @@ public class TestBroadbandHandler {
 
       assertEquals(responseBody1.get("date"), responseBody2.get("date")); // same date/time
 
-      Thread.sleep(31000);
-      HttpURLConnection broadbandConnection3 = this.tryRequest("broadband?" + params);
+      String difParams = "state=New%20York&county=Monroe";
+      HttpURLConnection broadbandConnection3 = this.tryRequest("broadband?" + difParams);
       assertEquals(200, broadbandConnection3.getResponseCode()); // successful *connection*
       Buffer b3 = new Buffer().readFrom(broadbandConnection3.getInputStream());
       Map<String, Object> responseBody3 = this.adapter.fromJson(b3);
       Assert.notNull(responseBody3);
       this.showDetailsIfError(responseBody3);
-      assertEquals("success", responseBody2.get("result"));
+      assertEquals("success", responseBody3.get("result"));
 
       assertNotEquals(responseBody1.get("date"), responseBody3.get("date")); // different date/time
       assertNotEquals(responseBody2.get("date"), responseBody3.get("date")); // different date/time
+
+      Thread.sleep(6000);
+      HttpURLConnection broadbandConnection4 = this.tryRequest("broadband?" + params);
+      assertEquals(200, broadbandConnection4.getResponseCode()); // successful *connection*
+      Buffer b4 = new Buffer().readFrom(broadbandConnection4.getInputStream());
+      Map<String, Object> responseBody4 = this.adapter.fromJson(b4);
+      Assert.notNull(responseBody4);
+      this.showDetailsIfError(responseBody4);
+      assertEquals("success", responseBody4.get("result"));
+
+      assertNotEquals(responseBody1.get("date"), responseBody4.get("date")); // different date/time
+      assertNotEquals(responseBody2.get("date"), responseBody4.get("date")); // different date/time
+      assertNotEquals(responseBody3.get("date"), responseBody4.get("date")); // different date/time
 
       broadbandConnection1.disconnect();
       broadbandConnection2.disconnect();
@@ -167,7 +230,7 @@ public class TestBroadbandHandler {
       this.showDetailsIfError(responseBody1);
       assertEquals("success", responseBody1.get("result"));
 
-      Thread.sleep(5000);
+      Thread.sleep(1000);
       HttpURLConnection broadbandConnection2 = this.tryRequest("broadband?" + params);
       assertEquals(200, broadbandConnection2.getResponseCode()); // successful *connection*
       Buffer b2 = new Buffer().readFrom(broadbandConnection2.getInputStream());
@@ -178,7 +241,7 @@ public class TestBroadbandHandler {
 
       assertEquals(responseBody1.get("date"), responseBody2.get("date")); // same date/time
 
-      Thread.sleep(31000);
+      Thread.sleep(6000);
       HttpURLConnection broadbandConnection3 = this.tryRequest("broadband?" + params);
       assertEquals(200, broadbandConnection3.getResponseCode()); // successful *connection*
       Buffer b3 = new Buffer().readFrom(broadbandConnection3.getInputStream());

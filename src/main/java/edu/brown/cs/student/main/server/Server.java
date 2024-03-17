@@ -9,6 +9,7 @@ import edu.brown.cs.student.main.server.broadband.BroadbandHandler;
 import edu.brown.cs.student.main.server.cache.APICache;
 import edu.brown.cs.student.main.server.csv.LoadCSVHandler;
 import edu.brown.cs.student.main.server.csv.SearchCSVHandler;
+import edu.brown.cs.student.main.server.csv.UnloadCSVHandler;
 import edu.brown.cs.student.main.server.csv.ViewCSVHandler;
 import java.util.concurrent.TimeUnit;
 import spark.Spark;
@@ -37,6 +38,7 @@ public class Server {
     Spark.get(
         "broadband", new APICache(new BroadbandHandler(new ACSBroadbandSource()), cacheBuilder));
     Spark.get("loadcsv", new LoadCSVHandler(parser));
+    Spark.get("unloadcsv", new UnloadCSVHandler(parser));
     Spark.get("viewcsv", new ViewCSVHandler(parser));
     Spark.get("searchcsv", new SearchCSVHandler(parser));
     Spark.init();

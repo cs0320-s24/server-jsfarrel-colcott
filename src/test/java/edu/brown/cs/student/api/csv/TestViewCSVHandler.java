@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import okio.Buffer;
@@ -237,6 +238,46 @@ public class TestViewCSVHandler {
       loadConnection.disconnect();
       viewConnection.disconnect();
     }
+  }
+
+  /**
+   * Determine if a String is a proper String representation of an int. Uses regex to determine if a
+   * string matches pattern of an integer. Limitations: doesn't return false for values outside the
+   * integer limit. <a
+   * href="https://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java">
+   * source </a>
+   *
+   * @param s - a String to check if it is an integer
+   * @return true if s represents an integer, false if else
+   */
+  public boolean isInteger(String s) {
+    return s.matches("-?(0|[1-9]\\d*)");
+  }
+
+  static final int NUM_TRIALS = 100000;
+  static final int MAX_LENGTH = 8;
+
+  @Test
+  public void testIsIntegerFuzz() {
+    for (int i = 0; i < NUM_TRIALS; i++) {
+      String s = getRandomString();
+      System.out.println(i + " : " + s);
+      isInteger(s);
+    }
+  }
+
+  public String getRandomString() {
+    // src:
+    // https://stackoverflow.com/questions/2626835/is-there-functionality-to-generate-a-random-character-in-java
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-'`~[]{}()_=-+.";
+    int charsLength = chars.length();
+    StringBuilder output = new StringBuilder();
+    int outputLength = ThreadLocalRandom.current().nextInt(MAX_LENGTH);
+    for (int i = 0; i < outputLength; i++) {
+      int ind = ThreadLocalRandom.current().nextInt(charsLength);
+      output.append(chars.charAt(ind));
+    }
+    return output.toString();
   }
 
   /**
